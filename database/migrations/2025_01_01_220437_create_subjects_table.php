@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique(); 
+            $table->string('code')->unique();
             $table->string('name');
-            $table->text('description')->nullable(); 
+            $table->text('description')->nullable();
             $table->integer('credits')->default(0);
-            $table->enum('level', ['primary', 'secondary', 'highschool', 'university'])->nullable(); // education stage
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
