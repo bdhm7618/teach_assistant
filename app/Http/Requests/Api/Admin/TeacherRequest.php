@@ -12,8 +12,8 @@ class TeacherRequest extends FormRequest
        
         return [
             'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:teachers,email,' . $this->teacher->id,
-            'phone'     => 'required|string|max:20|unique:teachers,phone,' . $this->teacher->id,
+            'email'     => 'required|email|unique:teachers,email,' . $this?->teacher?->id,
+            'phone'     => 'required|string|max:20|unique:teachers,phone,' . $this?->teacher?->id,
             'gender'    => 'required|in:male,female',
             'password'  => $this->isMethod('post') ? 'required|min:6' : 'nullable|min:6',
             'status'    => 'boolean',
