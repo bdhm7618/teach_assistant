@@ -17,7 +17,7 @@ if (!function_exists('successResponse')) {
 
 
 if (!function_exists('errorResponse')) {
-    function errorResponse($message = 'Error',  ?Exception $exception = null, $errors = [], $code = 500): JsonResponse
+    function errorResponse($message = 'Error',  null|array|string|Exception $exception = null, $errors = [], $code = 500): JsonResponse
     {
         $response = [
             'status'  => 'error',
@@ -25,7 +25,7 @@ if (!function_exists('errorResponse')) {
             'errors'  => $errors,
         ];
 
-        if ($exception && App::environment('local')) {
+        if ($exception instanceof Exception && App::environment('local')) {
             $response['error_details'] = $exception->getMessage();
         }
 

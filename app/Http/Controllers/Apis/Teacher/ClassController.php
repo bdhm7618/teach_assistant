@@ -8,14 +8,17 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Class\ClassResource;
 use App\Http\Requests\Api\Admin\ClassRequest;
+use Illuminate\Validation\ValidationException;
 
 
 class ClassController extends Controller
 {
     public function index()
     {
+
         try {
-            $classes = ClassModel::all();
+            $classes = ClassModel::where("channel_id", $this->channel->id)->get();
+
             return successResponse(ClassResource::collection($classes));
         } catch (\Exception $e) {
             return errorResponse("error", $e);
@@ -26,19 +29,33 @@ class ClassController extends Controller
     {
         DB::beginTransaction();
         try {
-            $class = ClassModel::create($request->validated());
+            $data = $request->validated();
+            $data["channel_id"] = $this->channel->id;
+            $class = ClassModel::create($data);
             DB::commit();
-            return successResponse(new ClassResource($class) , "Classroom Created Successfully");
+            return successResponse(new ClassResource($class), "Classroom Created Successfully");
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Validation failed',
+                'errors'  => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             DB::rollBack();
             return errorResponse("error", $e);
         }
     }
 
-    public function show(ClassModel $class)
+    public function show($id)
     {
+        $class = ClassModel::where("channel_id", $this->channel->id)->where("id", $id)->first();
+        if (!$class) {
+            return errorResponse('Class not found In this Channel!', null, [], 404);
+        }
+
         try {
-            return successResponse(new ClassResource($class) );
+            return successResponse(new ClassResource($class));
         } catch (\Exception $e) {
             return errorResponse("error", $e);
         }
@@ -50,7 +67,7 @@ class ClassController extends Controller
         try {
             $class->update($request->validated());
             DB::commit();
-            return successResponse(new ClassResource($class) ,"ClassRoom Updated Successfully");
+            return successResponse(new ClassResource($class), "ClassRoom Updated Successfully");
         } catch (\Exception $e) {
             DB::rollBack();
             return errorResponse("error", $e);

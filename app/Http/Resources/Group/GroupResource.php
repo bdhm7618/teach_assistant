@@ -27,6 +27,17 @@ class GroupResource extends JsonResource
             'teacher_id'         => $this->teacher_id,
             'created_at'         => $this->created_at?->toDateTimeString(),
             'updated_at'         => $this->updated_at?->toDateTimeString(),
+
+            'times' => $this->times->map(function ($time) {
+                return [
+                    'id'         => $time->id,
+                    'class_time' => $time->class_time,
+                    'day_name'   => $time->day_name,
+                    'status'     => $time->status,
+                    'created_at' => $time->created_at?->toDateTimeString(),
+                    'updated_at' => $time->updated_at?->toDateTimeString(),
+                ];
+            }),
         ];
     }
 }

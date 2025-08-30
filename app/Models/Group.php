@@ -17,8 +17,14 @@ class Group extends Model
         'teacher_id',
     ];
 
+   protected  $prefix = 'GRP';
+
     public function class()
     {
         return $this->belongsTo(ClassModel::class, "class_id");
+    }
+    public function times()
+    {
+        return $this->hasMany(ClassTime::class);
     }
 }

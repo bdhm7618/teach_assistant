@@ -21,6 +21,8 @@ class GroupRequest extends FormRequest
      */
     public function rules(): array
     {
+        $days = implode(",", array_keys(config("days")));
+
         return [
             'name'               => 'required|string|max:255',
             'code'               => 'required|string|max:50|unique:groups,code,' . $this?->group?->id,
@@ -30,6 +32,9 @@ class GroupRequest extends FormRequest
             'status'             => 'boolean',
             'channel_id'         => 'required|integer|exists:channels,id',
             'teacher_id'         => 'required|integer|exists:teachers,id',
+            "times" => ["required", "array", "min:2"],
+            "times.*.class_time" => ["required", "date_format:H:i"],
+            "times.*.day_name" => ["required", "in:$days"]
         ];
     }
 }
