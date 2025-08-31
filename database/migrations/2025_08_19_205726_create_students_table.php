@@ -15,13 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string("code", 255)->unique();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string("phone", 20)->unique()->nullable();
             $table->enum("geneder", ["male", "female"]);
             $table->string('password')->nullable();
             $table->tinyInteger('status')->default(1);
-             $table->foreignId("channel_id")->constrained("channels")->restrictOnDelete();
+            $table->foreignId("channel_id")->constrained("channels")->restrictOnDelete();
+            $table->foreignId("group_id")->constrained("groups")->restrictOnDelete();
+
             $table->string("image", 500)->nullable();
             $table->rememberToken();
             $table->timestamps();

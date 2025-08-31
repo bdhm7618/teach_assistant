@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\CodeGenerator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 class Group extends Model
 {
+    use CodeGenerator;
     protected $fillable = [
         'name',
         'code',
@@ -17,7 +20,7 @@ class Group extends Model
         'teacher_id',
     ];
 
-   protected  $prefix = 'GRP';
+    protected  $prefix = 'GRP';
 
     public function class()
     {
@@ -26,5 +29,33 @@ class Group extends Model
     public function times()
     {
         return $this->hasMany(ClassTime::class);
+    }
+    public function generateCode(): string
+    {
+        $data = request()->all();
+
+        $class_code = ClassModel::select("code")->where("id", $data["class_id"])->first()?->code;
+        $count = $this->where("class_id", $data["class_id"])->count();
+
+        return   str_replace("CLS", $this->prefix . "-" . ++$count, $class_code);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->code)) {
+
+                $code  = $model->generateCode();
+                if (self::where("code", $code)->exists()) {
+                    throw ValidationException::withMessages([
+                        'code' => ["The code [$code] already exists in this channel."],
+                    ]);
+                }
+
+                $model->code = $code;
+            }
+        });
     }
 }

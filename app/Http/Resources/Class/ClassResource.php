@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Class;
 
+use App\Http\Resources\Group\GroupResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,6 +26,10 @@ class ClassResource extends JsonResource
             'subject_id' => $this->subject_id,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
+            'groups'     => GroupResource::collection($this->whenLoaded('groups')),
+
+
+
         ];
     }
 }

@@ -8,16 +8,22 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Class\ClassResource;
 use App\Http\Requests\Api\Admin\ClassRequest;
+use App\Models\Subject;
 use Illuminate\Validation\ValidationException;
 
 
 class ClassController extends Controller
 {
+
+    public function getMetaData()
+    {
+        return successResponse(["subjects" => Subject::all()]);
+    }
     public function index()
     {
 
         try {
-            $classes = ClassModel::where("channel_id", $this->channel->id)->get();
+            $classes = ClassModel::where("channel_id", $this->channel->id)->with("groups")->get();
 
             return successResponse(ClassResource::collection($classes));
         } catch (\Exception $e) {

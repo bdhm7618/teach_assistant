@@ -30,6 +30,12 @@ class ClassModel extends Model
         return $this->belongsTo(Subject::class, "subject_id");
     }
 
+    public function groups()
+    {
+        return $this->hasMany(Group::class, "class_id");
+    }
+
+
     private static function mapYearToCode(int $year): string
     {
         if ($year >= 1 && $year <= 6) {
@@ -53,7 +59,7 @@ class ClassModel extends Model
 
         $subject_code = Subject::select("code")->where("id", $data["subject_id"])->first()?->code;
 
-        return $this->channel->id . "-" . $this->prefix . "-" . $subject_code . "-" . self::mapYearToCode($data["year"]);
+        return "C" .  $this->channel->id . "-" . $this->prefix . "-" . $subject_code . "-" . self::mapYearToCode($data["year"]);
     }
 
 
@@ -63,7 +69,7 @@ class ClassModel extends Model
 
         static::creating(function ($model) {
             if (empty($model->code)) {
-                
+
                 $code  = $model->generateCode();
 
                 if (ClassModel::where("code", $code)->exists()) {
