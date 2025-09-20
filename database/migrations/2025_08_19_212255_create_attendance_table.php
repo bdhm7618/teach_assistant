@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('attendance', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('group_id')->constrained('groups')->nullOnDelete();
+            $table->foreignId('session_time_id')->constrained('session_times')->nullOnDelete();
             $table->foreignId('student_id')->constrained('students')->nullOnDelete();
             $table->date('date');
             $table->enum('status', ['present', 'absent', 'late']);

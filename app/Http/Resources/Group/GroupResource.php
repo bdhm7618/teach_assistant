@@ -31,7 +31,7 @@ class GroupResource extends JsonResource
             'times' => $this->times->map(function ($time) {
                 return [
                     'id'         => $time->id,
-                    'class_time' => $time->class_time,
+                    'session_time' => $time->session_time,
                     'day_name'   => $time->day_name,
                     'status'     => $time->status,
                     'created_at' => $time->created_at?->toDateTimeString(),

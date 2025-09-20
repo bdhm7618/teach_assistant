@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Apis\Teacher;
 
 
 use App\Models\Student;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\StudentRequest;

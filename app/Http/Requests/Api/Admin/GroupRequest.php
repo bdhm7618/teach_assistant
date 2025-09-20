@@ -26,12 +26,12 @@ class GroupRequest extends FormRequest
         return [
             'name'               => 'required|string|max:255',
             'class_id'           => 'required|integer|exists:classes,id',
-            'numbre_of_sessions' => 'required|integer|min:1',
+            'number_of_sessions' => 'required|integer|min:1',
             'price_of_group'     => 'required|numeric|min:0',
             'status'             => 'boolean',
             'teacher_id'         => 'nullable|integer|exists:teachers,id',
             "times" => ["required", "array", "min:2"],
-            "times.*.class_time" => ["required", "date_format:H:i"],
+            "times.*.session_time" => ["required", "date_format:H:i"],
             "times.*.day_name" => ["required", "in:$days"]
         ];
     }

@@ -19,6 +19,7 @@ class StudentResource extends JsonResource
             'geneder'         => $this->geneder,
             'status'          => $this->status,
             'group_id'      => $this->group_id,
+            "channel_id" => $this->channel_id,
             // 'image'           => $this->image,
             'created_at'      => $this->created_at?->toDateTimeString(),
             'updated_at'      => $this->updated_at?->toDateTimeString(),

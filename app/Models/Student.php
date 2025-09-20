@@ -24,7 +24,7 @@ class Student extends Model
         'password',
         'status',
         'group_id',
-        "channel_id", 
+        "channel_id",
         'image',
     ];
 
@@ -45,9 +45,15 @@ class Student extends Model
 
         $group_code = Group::select("code")->where("id", $data["group_id"])->first()?->code;
 
-        $count = $this->where("group_id", $data["group_id"])->count();
+        $count = $this->select("id")->where("group_id", $data["group_id"])->latest()->first()?->id ?? 0;
 
-        return str_replace("GRP-1", "GRP-1-" . $this->prefix . ++$count, $group_code);
+        $grp = "GRP";
+
+        if (preg_match('/GRP-\d+/', $group_code, $match)) {
+            $grp =  $match[0];
+        }
+
+        return preg_replace('/(GRP-\d+)/', $grp . "-" . $this->prefix . ++$count, $group_code);
     }
 
     protected static function boot()
@@ -58,6 +64,7 @@ class Student extends Model
             if (empty($model->code)) {
 
                 $code  = $model->generateCode();
+
                 if (self::where("code", $code)->exists()) {
                     throw ValidationException::withMessages([
                         'code' => ["The code [$code] already exists in this channel."],
@@ -67,5 +74,11 @@ class Student extends Model
                 $model->code = $code;
             }
         });
+    }
+
+    public function attendanceForToday()
+    {
+        return $this->hasMany(\App\Models\Attendance::class, 'student_id')
+            ->whereDate('date', now()->toDateString());
     }
 }

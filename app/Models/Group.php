@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Student;
+use App\Models\SessionTime;
 use App\Traits\CodeGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
@@ -28,8 +30,13 @@ class Group extends Model
     }
     public function times()
     {
-        return $this->hasMany(ClassTime::class);
+        return $this->hasMany(SessionTime::class);
     }
+ public function students() { 
+    return $this->hasMany( Student::class);
+ }
+
+
     public function generateCode(): string
     {
         $data = request()->all();
