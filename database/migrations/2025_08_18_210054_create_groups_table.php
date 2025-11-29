@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->string("name", 255);
-            $table->string("code", 255)->unique()->nullable();
+            $table->string("code")->unique()->nullable();
             $table->foreignId('class_id')->constrained('classes')->nullOnDelete();
             $table->tinyInteger("numbre_of_sessions")->default(8);
             $table->decimal("price_of_group")->nullable();

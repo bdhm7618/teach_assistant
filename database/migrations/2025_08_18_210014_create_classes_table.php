@@ -16,7 +16,7 @@ return new class extends Migration
             $table->year("start_year")->nullable();
             $table->year("end_year")->nullable();
             $table->string("name", 255);
-            $table->string("code", 255)->unique()->nullable();
+            $table->string("code")->unique()->nullable();
             $table->tinyInteger('status')->default(1);
             $table->foreignId("channel_id")->constrained("channels")->restrictOnDelete();
             $table->foreignId("subject_id")->constrained("subjects")->restrictOnDelete();
