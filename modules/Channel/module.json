@@ -1,0 +1,10 @@
+{
+    "name": "Channel",
+    "alias": "channel",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+    ],
+    "files": []
+}

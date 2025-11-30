@@ -1,0 +1,10 @@
+{
+    "name": "Admin",
+    "alias": "admin",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+    ],
+    "files": []
+}
