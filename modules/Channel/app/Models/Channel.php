@@ -1,9 +1,8 @@
 <?php
 
-namespace Modules\Channel\Models;
+namespace Modules\Channel\App\Models;
 
 use Modules\Admin\Models\Admin;
-use Modules\Channel\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -15,7 +14,7 @@ class Channel extends Model
         'code',
         'name',
         'is_private',
-        'created_by'
+        'created_by_admin'
     ];
 
     public function creator()

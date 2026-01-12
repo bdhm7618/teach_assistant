@@ -1,18 +1,18 @@
 <?php
 
-namespace Modules\Channel\Http\Controllers;
+namespace Modules\Academic\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class ChannelController extends Controller
+class AcademicController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('channel::index');
+        dd("ok");
     }
 
     /**
@@ -20,7 +20,7 @@ class ChannelController extends Controller
      */
     public function create()
     {
-        return view('channel::create');
+        return view('academic::create');
     }
 
     /**
@@ -33,7 +33,7 @@ class ChannelController extends Controller
      */
     public function show($id)
     {
-        return view('channel::show');
+        return view('academic::show');
     }
 
     /**
@@ -41,7 +41,7 @@ class ChannelController extends Controller
      */
     public function edit($id)
     {
-        return view('channel::edit');
+        return view('academic::edit');
     }
 
     /**

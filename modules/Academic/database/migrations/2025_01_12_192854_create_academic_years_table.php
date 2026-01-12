@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('session_times', function (Blueprint $table) {
+        Schema::create('academic_years', function (Blueprint $table) {
             $table->id();
-            $table->time("session_time");
-            $table->string("day_name");
-            $table->foreignId("group_id")->constrained("groups")->nullOnDelete();
-            $table->tinyInteger('status')->default(1);
+            $table->string('name')->nullable(); // 2024/2025
+            $table->year('start_year');
+            $table->year('end_year');
+            $table->boolean('is_active')->default(false);
+            $table->foreignId('channel_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('session_times');
+        Schema::dropIfExists('academic_years');
     }
 };

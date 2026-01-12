@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
-            $table->string("name", 255);
-            $table->string("code")->unique()->nullable();
-            $table->foreignId('class_id')->constrained('classes')->nullOnDelete();
-            $table->tinyInteger("numbre_of_sessions")->default(8);
-            $table->decimal("price_of_group")->nullable();
-            $table->tinyInteger('status')->default(1);
-            $table->foreignId("channel_id")->constrained("channels")->restrictOnDelete();
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->foreignId('class_grade_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
+            $table->unsignedTinyInteger( 'capacity')->default(30);
+            $table->decimal('price', 8, 2)->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->foreignId('channel_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("code")->nullable();
             $table->string('name');
             $table->boolean('is_private')->default(false);
-            $table->foreignId('created_by')->constrained('admins')->nullOnDelete();
+            $table->foreignId('created_by_admin')->nullable()->constrained('admins')->nullOnDelete();
             $table->timestamps();
         });
     }

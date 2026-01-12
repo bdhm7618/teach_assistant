@@ -1,9 +1,11 @@
 <?php
 
-namespace Modules\Channel\Models;
+namespace Modules\Channel\App\Models;
 
-use Modules\Channel\Models\Channel;
+
+use Modules\Core\App\Models\Otp;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -11,7 +13,7 @@ class User extends  Authenticatable implements JWTSubject
 {
     use HasFactory;
 
-    public function getJWTIdentifier()
+    public function getJWTIdentifier()  
     {
         return $this->getKey();
     }
@@ -31,8 +33,8 @@ class User extends  Authenticatable implements JWTSubject
         'password',
         'status',
         'image',
+        'role_id',
         'channel_id',
-        "is_admin"
     ];
 
     protected $hidden = [
@@ -43,5 +45,16 @@ class User extends  Authenticatable implements JWTSubject
     public function channel()
     {
         return $this->belongsTo(Channel::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, "role_id");
+    }
+
+
+    public function otps(): MorphMany
+    {
+        return $this->morphMany(Otp::class, 'otpable');
     }
 }

@@ -3,5 +3,6 @@
     "Channel": true,
     "User": true,
     "Core": true,
-    "Admin": true
+    "Admin": true,
+    "Academic": true
 }

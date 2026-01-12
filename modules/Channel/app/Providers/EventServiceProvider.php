@@ -1,7 +1,10 @@
 <?php
 
-namespace Modules\Channel\Providers;
+namespace Modules\Channel\App\Providers;
 
+
+use Modules\Channel\App\Events\UserRegistered;
+use Modules\Channel\App\Listeners\SendEmailVerificationListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -11,7 +14,11 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        UserRegistered::class => [
+            SendEmailVerificationListener::class,
+        ],
+    ];
 
     /**
      * Indicates if events should be discovered.

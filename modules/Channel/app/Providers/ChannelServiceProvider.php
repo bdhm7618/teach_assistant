@@ -1,6 +1,7 @@
 <?php
 
-namespace Modules\Channel\Providers;
+namespace Modules\Channel\App\Providers;
+
 
 
 use Illuminate\Support\Facades\Blade;
@@ -27,6 +28,8 @@ class ChannelServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerRoutes();
+        $this->registerViews();
     }
 
     /**
@@ -40,35 +43,42 @@ class ChannelServiceProvider extends ServiceProvider
     /**
      * Register commands in the format of Command::class
      */
-    protected function registerCommands(): void
-    {
-        // $this->commands([]);
-    }
+    protected function registerCommands(): void {}
 
     /**
      * Register command Schedules.
      */
-    protected function registerCommandSchedules(): void
-    {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
-    }
+    protected function registerCommandSchedules(): void {}
 
     /**
      * Register translations.
      */
-    public function registerTranslations(): void
+    protected function registerTranslations(): void
     {
-        $langPath = resource_path('lang/modules/' . $this->nameLower);
 
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, $this->nameLower);
-            $this->loadJsonTranslationsFrom($langPath);
+        $moduleLangPath = module_path($this->name, 'Resources/lang'); // Module lang folder
+        $overrideLangPath = resource_path('lang/modules/' . $this->nameLower); // Optional override path
+
+        // Load override translations first (if exist)
+        if (is_dir($overrideLangPath)) {
+            $this->loadTranslationsFrom($overrideLangPath, $this->nameLower);
+        }
+
+        // Load default module translations
+        if (is_dir($moduleLangPath)) {
+            $this->loadTranslationsFrom($moduleLangPath, $this->nameLower);
+        }
+    }
+    protected function registerViews(): void
+    {
+        $viewPath = resource_path('views/modules/channel');
+
+        $sourcePath = module_path('Channel', 'Resources/views');
+
+        if (is_dir($viewPath)) {
+            $this->loadViewsFrom($viewPath, 'channel');
         } else {
-            $this->loadTranslationsFrom(module_path($this->name, 'lang'), $this->nameLower);
-            $this->loadJsonTranslationsFrom(module_path($this->name, 'lang'));
+            $this->loadViewsFrom($sourcePath, 'channel');
         }
     }
 
@@ -116,7 +126,7 @@ class ChannelServiceProvider extends ServiceProvider
         config([$key => array_replace_recursive($existing, $module_config)]);
     }
 
-  
+
 
     /**
      * Get the services provided by the provider.
@@ -124,5 +134,18 @@ class ChannelServiceProvider extends ServiceProvider
     public function provides(): array
     {
         return [];
+    }
+
+
+    protected function registerRoutes(): void
+    {
+        $routesPath = module_path($this->name, 'routes');
+
+        if (is_dir($routesPath)) {
+
+            if (file_exists($routesPath . '/api-v1.php')) {
+                $this->loadRoutesFrom($routesPath . '/api-v1.php');
+            }
+        }
     }
 }
