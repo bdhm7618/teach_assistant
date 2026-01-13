@@ -21,11 +21,4 @@ class AcademicYearRequest extends FormRequest
             'is_active' => 'sometimes|boolean'
         ];
     }
-
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'channel_id' => auth()->user()->channel_id
-        ]);
-    }
 }

@@ -15,6 +15,7 @@ class ClassGradeRepository extends BaseRepository
 
     public function create(array $data): ClassGrade
     {
+        $data['channel_id'] = auth("user")->user()?->channel_id;
         return $this->model->create($data);
     }
 }

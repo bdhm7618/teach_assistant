@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Apis\Admin;
 
-use App\Models\Channel;
+
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Modules\Channel\App\Models\Channel;
 use App\Http\Requests\Api\Admin\ChannelRequest;
 use App\Http\Resources\Channel\ChannelResource;
 
@@ -14,7 +15,7 @@ class ChannelController extends Controller
     // GET /channels
     public function index()
     {
-        try {
+        try { 
 
             return successResponse(ChannelResource::collection(Channel::all()));
         } catch (\Exception $e) {

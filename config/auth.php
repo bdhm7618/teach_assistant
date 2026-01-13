@@ -1,5 +1,7 @@
 <?php
 
+
+
 return [
 
     /*
@@ -18,9 +20,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'guards' => [
-        'teacher' => [
+        'user' => [
             'driver' => 'jwt',
-            'provider' => 'teachers',
+            'provider' => 'users',
         ],
 
         'admin' => [
@@ -35,14 +37,14 @@ return [
     |--------------------------------------------------------------------------
     */
     'providers' => [
-        'teachers' => [
+        'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Teacher::class,
+            'model' => \Modules\Channel\App\Models\User::class,
         ],
 
         'admins' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin::class,
+            'model' => \Modules\Admin\Models\Admin::class,
         ],
     ],
 
@@ -52,17 +54,17 @@ return [
     |--------------------------------------------------------------------------
     */
     'passwords' => [
-        'teachers' => [
-            'provider' => 'teachers',
+        'users' => [
+            'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
+            'expire' => 60*24*30,
             'throttle' => 60,
         ],
 
         'admins' => [
             'provider' => 'admins',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
+            'expire' => 60*24*30,
             'throttle' => 60,
         ],
     ],

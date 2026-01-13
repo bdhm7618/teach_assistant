@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Traits\CodeGenerator;
+use Modules\Channel\App\Traits\HasChannelScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
 class ClassModel extends Model
 {
-    use CodeGenerator;
+    use CodeGenerator, HasChannelScope;
     protected $table = "classes";
     protected $fillable = [
         'start_year',

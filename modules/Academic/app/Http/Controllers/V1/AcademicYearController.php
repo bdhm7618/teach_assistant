@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\Academic\App\Http\Controllers\V1;
 
 
@@ -19,8 +20,7 @@ class AcademicYearController extends Controller
 
     public function index()
     {
-        $years = $this->repository->all(auth()->user()->channel_id);
-        return successResponse(AcademicYearResource::collection($years));
+        return successResponse(AcademicYearResource::collection($this->repository->all()), trans('academic::app.academic_year.list'));
     }
 
     public function store(AcademicYearRequest $request)
@@ -42,7 +42,7 @@ class AcademicYearController extends Controller
 
     public function show($id)
     {
-        $year = $this->repository->find($id, auth()->user()->channel_id);
+        $year = $this->repository->find($id, auth("user")->user()?->channel_id);
         return successResponse(new AcademicYearResource($year));
     }
 
@@ -50,7 +50,7 @@ class AcademicYearController extends Controller
     {
         DB::beginTransaction();
         try {
-            $year = $this->repository->find($id, auth()->user()->channel_id);
+            $year = $this->repository->find($id, auth("user")->user()?->channel_id);
             $year = $this->repository->update($year, $request->validated());
             DB::commit();
             return successResponse(
@@ -67,7 +67,7 @@ class AcademicYearController extends Controller
     {
         DB::beginTransaction();
         try {
-            $year = $this->repository->find($id, auth()->user()->channel_id);
+            $year = $this->repository->find($id, auth("user")->user()?->channel_id);
             $this->repository->delete($year);
             DB::commit();
             return successResponse(null, trans('academic::app.academic_year.deleted'));
@@ -82,7 +82,7 @@ class AcademicYearController extends Controller
     {
         DB::beginTransaction();
         try {
-            $year = $this->repository->find($id, auth()->user()->channel_id);
+            $year = $this->repository->find($id, auth("user")->user()?->channel_id);
             $year = $this->repository->activate($year);
             DB::commit();
             return successResponse(

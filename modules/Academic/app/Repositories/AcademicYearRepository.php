@@ -12,4 +12,10 @@ class AcademicYearRepository extends BaseRepository
     {
         return AcademicYear::class;
     }
+
+    public function create(array $data)
+    {
+        $data['channel_id'] = auth("user")->user()?->channel_id;
+        return $this->model->create($data);
+    }
 }

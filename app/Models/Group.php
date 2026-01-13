@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Models\Student;
 use App\Models\SessionTime;
 use App\Traits\CodeGenerator;
+use Modules\Channel\App\Traits\HasChannelScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
 class Group extends Model
 {
-    use CodeGenerator;
+    use CodeGenerator, HasChannelScope;
     protected $fillable = [
         'name',
         'code',

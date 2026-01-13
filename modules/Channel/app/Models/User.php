@@ -2,7 +2,6 @@
 
 namespace Modules\Channel\App\Models;
 
-
 use Modules\Core\App\Models\Otp;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\MorphMany;

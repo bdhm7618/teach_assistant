@@ -2,12 +2,12 @@
 
 namespace Modules\Academic\App\Models;
 
-
+use Modules\Channel\App\Traits\HasChannelScope;
 use Illuminate\Database\Eloquent\Model;
-
 
 class Group extends Model
 {
+    use HasChannelScope;
     protected $fillable = [
         'name',
         'code',

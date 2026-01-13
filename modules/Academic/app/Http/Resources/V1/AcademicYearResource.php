@@ -15,6 +15,9 @@ class AcademicYearResource extends JsonResource
             'start_year' => $this->start_year,
             'end_year' => $this->end_year,
             'is_active' => $this->is_active,
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
+            'channel_id' => $this->channel_id,
         ];
     }
 }

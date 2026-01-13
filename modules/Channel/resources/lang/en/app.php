@@ -73,6 +73,7 @@ return [
     'auth' => [
         'invalid_credentials' => 'Invalid credentials.',
         'login_success' => 'Login successful.',
+        'blocked' => 'Account blocked.',
     ],
     'password' => [
         'reset_otp_sent' => 'Password reset OTP has been sent.',

@@ -13,5 +13,6 @@ return [
         'deleted' => 'Academic year deleted successfully.',
         'not_found' => 'Academic year not found.',
         'already_active' => 'This academic year is already active.',
+        'list' => 'Academic year list retrieved successfully.',
     ],
 ];

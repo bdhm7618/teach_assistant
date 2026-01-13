@@ -41,7 +41,7 @@ class ClassGradeController extends Controller
     {
         DB::beginTransaction();
         try {
-            $class = $this->repository->find($id, auth()->user()->channel_id);
+            $class = $this->repository->find($id, auth("user")->user()?->channel_id);
             $class = $this->repository->update($class, $request->validated());
             DB::commit();
             return successResponse(
@@ -58,7 +58,7 @@ class ClassGradeController extends Controller
     {
         DB::beginTransaction();
         try {
-            $class = $this->repository->find($id, auth()->user()->channel_id);
+            $class = $this->repository->find($id, auth("user")->user()?->channel_id);
             $this->repository->delete($class);
             DB::commit();
             return successResponse(null, trans('academic::app.class.deleted'));

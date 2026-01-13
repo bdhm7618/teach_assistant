@@ -18,7 +18,7 @@ class UserRepository extends BaseRepository
     public function create(array $data)
     {
         $data['password'] = Hash::make($data['password']);
-        $data['role_id'] = Role::where('name', 'owner')->first()->id;
+        $data['role_id'] = Role::where('name', 'owner')->first()?->id;
         $user = $this->model->create($data);
         return $user;
     }

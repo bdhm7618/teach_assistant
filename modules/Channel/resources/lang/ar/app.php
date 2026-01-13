@@ -72,6 +72,7 @@ return [
     'auth' => [
         'invalid_credentials' => 'بيانات الدخول غير صحيحة.',
         'login_success' => 'تم تسجيل الدخول بنجاح.',
+        'blocked' => 'الحساب محظور.',
     ],
 
     'password' => [

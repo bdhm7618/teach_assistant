@@ -58,19 +58,20 @@ class AcademicServiceProvider extends ServiceProvider
         // });
     }
 
-    /**
-     * Register translations.
-     */
-    public function registerTranslations(): void
+    protected function registerTranslations(): void
     {
-        $langPath = resource_path('lang/modules/' . $this->nameLower);
 
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, $this->nameLower);
-            $this->loadJsonTranslationsFrom($langPath);
-        } else {
-            $this->loadTranslationsFrom(module_path($this->name, 'lang'), $this->nameLower);
-            $this->loadJsonTranslationsFrom(module_path($this->name, 'lang'));
+        $moduleLangPath = module_path($this->name, 'Resources/lang'); // Module lang folder
+        $overrideLangPath = resource_path('lang/modules/' . $this->nameLower); // Optional override path
+
+        // Load override translations first (if exist)
+        if (is_dir($overrideLangPath)) {
+            $this->loadTranslationsFrom($overrideLangPath, $this->nameLower);
+        }
+
+        // Load default module translations
+        if (is_dir($moduleLangPath)) {
+            $this->loadTranslationsFrom($moduleLangPath, $this->nameLower);
         }
     }
 

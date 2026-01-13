@@ -25,7 +25,7 @@ class ClassGradeRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'channel_id' => auth("channel-user")->user()->channel_id,
+            'channel_id' => auth("user")->user()->channel_id,
         ]);
     }
 }

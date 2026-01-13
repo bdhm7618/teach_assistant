@@ -30,20 +30,20 @@ class ChannelController extends Controller
      */
     public  function register(RegisterRequest $request)
     {
-        DB::beginTransaction();
-        try {
-            $data = $request->validated();
-            $channel = $this->channelRepository->create(["name" => $data['channel_name']]);
-            $data["channel_id"] = $channel->id;
-            $user = $this->userRepository->create($data);
-            DB::commit();
-            event(new UserRegistered($user));
+        // DB::beginTransaction();
+        // try {
+        $data = $request->validated();
+        $channel = $this->channelRepository->create(["name" => $data['channel_name']]);
+        $data["channel_id"] = $channel->id;
+        $user = $this->userRepository->create($data);
+        DB::commit();
+        event(new UserRegistered($user));
 
-            return successResponse(new UserResource($user), trans("channel::app.channel.created"), 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return errorResponse(trans('channel::app.common.operation_failed'), $e);
-        }
+        return successResponse(new UserResource($user), trans("channel::app.channel.created"), 201);
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return errorResponse(trans('channel::app.common.operation_failed'), $e);
+        // }
     }
 
 
@@ -120,6 +120,10 @@ class ChannelController extends Controller
 
         if (!Hash::check($request->password, $user->password)) {
             return errorResponse(trans('channel::app.auth.invalid_credentials'));
+        }
+
+        if ($user->status == 0) {
+            return errorResponse(trans('channel::app.user.blocked'));
         }
 
         $token = JWTAuth::fromUser($user);

@@ -5,13 +5,14 @@
 namespace App\Models;
 
 use App\Traits\CodeGenerator;
+use Modules\Channel\App\Traits\HasChannelScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Student extends Model
 {
-    use CodeGenerator;
+    use CodeGenerator, HasChannelScope;
     use HasFactory;
 
     protected $prefix = 'S';

@@ -2,11 +2,12 @@
 
 namespace Modules\Academic\App\Models;
 
-
+use Modules\Channel\App\Traits\HasChannelScope;
 use Illuminate\Database\Eloquent\Model;
 
 class ClassGrade extends Model
 {
+    use HasChannelScope;
     protected $table = 'classes';
 
     protected $fillable = [
