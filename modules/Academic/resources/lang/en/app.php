@@ -15,4 +15,8 @@ return [
         'already_active' => 'This academic year is already active.',
         'list' => 'Academic year list retrieved successfully.',
     ],
+    'validation' => [
+        'class_grade_duplicate' => 'Class grade (Level :grade_level - Stage :stage) already exists in this channel.',
+        'academic_year_not_belongs_to_channel' => 'The selected academic year does not belong to the current channel.',
+    ],
 ];

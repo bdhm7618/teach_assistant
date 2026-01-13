@@ -13,12 +13,11 @@ class ClassGradeResource extends JsonResource
             'id' => $this->id,
             'grade_level' => $this->grade_level,
             'stage' => $this->stage,
-            'display_name' => $this->display_name,
-            'academic_year' => [
-                'id' => $this->academicYear->id,
-                'name' => $this->academicYear->name
-            ],
-            'is_active' => $this->is_active
+            'academic_year_id' => $this->academic_year_id,
+            'is_active' => $this->is_active,
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
+            'channel_id' => $this->channel_id,
         ];
     }
 }

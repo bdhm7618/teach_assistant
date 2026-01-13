@@ -14,4 +14,8 @@ return [
         'already_active' => 'هذه السنة الدراسية مفعلة بالفعل.',
         "list" => 'تم إرجاع قائمة السنة الدراسية بنجاح.',
     ],
+    'validation' => [
+        'class_grade_duplicate' => 'الصف الدراسي (المستوى :grade_level - المرحلة :stage) موجود بالفعل في هذه القناة.',
+        'academic_year_not_belongs_to_channel' => 'السنة الدراسية المحددة غير مرتبطة بالقناة الحالية.',
+    ],
 ];

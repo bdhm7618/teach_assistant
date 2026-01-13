@@ -41,6 +41,9 @@ return [
     ],
     'common' => [
         'operation_failed' => 'حدث خطأ ما! يرجى المحاولة مرة أخرى.',
+        'not_found' => 'المورد غير موجود.',
+        'show_success' => 'تم عرض المورد بنجاح.',
+        'list_success' => 'تم عرض القائمة بنجاح.',
     ],
 
 
@@ -78,5 +81,10 @@ return [
     'password' => [
         'reset_otp_sent' => 'تم إرسال رمز إعادة تعيين كلمة المرور.',
         'reset_success' => 'تم إعادة تعيين كلمة المرور بنجاح.',
-    ],  
+    ],
+
+    'validation' => [
+        'model_not_belongs_to_channel' => 'الـ :model المحدد غير مرتبط بالقناة الحالية.',
+        'unique_in_channel' => 'هذا السجل موجود بالفعل في هذه القناة.',
+    ],
 ];

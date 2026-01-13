@@ -43,6 +43,9 @@ return [
 
     'common' => [
         'operation_failed' => 'Something went wrong! Please try again.',
+        'not_found' => 'Resource not found.',
+        'show_success' => 'Resource displayed successfully.',
+        'list_success' => 'List displayed successfully.',   
     ],
 
 
@@ -78,6 +81,11 @@ return [
     'password' => [
         'reset_otp_sent' => 'Password reset OTP has been sent.',
         'reset_success' => 'Password reset successfully.',
+    ],
+
+    'validation' => [
+        'model_not_belongs_to_channel' => 'The selected :model does not belong to the current channel.',
+        'unique_in_channel' => 'This record already exists in this channel.',
     ],
 
 

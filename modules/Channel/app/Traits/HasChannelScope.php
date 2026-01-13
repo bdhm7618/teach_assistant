@@ -14,6 +14,12 @@ trait HasChannelScope
     protected static function bootHasChannelScope()
     {
         static::addGlobalScope(new ChannelScope());
+
+        static::creating(function ($model) {
+            if (empty($model->channel_id) && auth("user")->check()) {
+                $model->channel_id = auth("user")->user()?->channel_id;
+            }
+        });
     }
 
     /**
@@ -26,4 +32,3 @@ trait HasChannelScope
         return static::withoutGlobalScope(ChannelScope::class);
     }
 }
-
