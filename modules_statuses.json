@@ -4,5 +4,6 @@
     "User": true,
     "Core": true,
     "Admin": true,
-    "Academic": true
+    "Academic": true,
+    "Student": true
 }

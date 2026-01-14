@@ -25,6 +25,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->foreignId('group_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('channel_id')->constrained()->cascadeOnDelete();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

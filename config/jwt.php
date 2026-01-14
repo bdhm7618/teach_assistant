@@ -103,6 +103,25 @@ return [
 
     'ttl' => env('JWT_TTL', 60),
 
+        /*
+    |--------------------------------------------------------------------------
+    | JWT time to live per guard
+    |--------------------------------------------------------------------------
+    |
+    | Specify the length of time (in minutes) that the token will be valid for
+    | per authentication guard. This allows different expiration times for
+    | different user types (e.g., users vs admins).
+    |
+    | Format: 'guard_name' => minutes
+    | Example: 'user' => 10080 (1 week), 'admin' => 60 (1 hour)
+    |
+    */
+
+    'guards_ttl' => [
+        'user' => env('JWT_USER_TTL', 10080), // 1 week (7 days * 24 hours * 60 minutes)
+        'admin' => env('JWT_ADMIN_TTL', 60), // 1 hour (default)
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Refresh time to live

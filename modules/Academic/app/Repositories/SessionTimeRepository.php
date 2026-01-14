@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Academic\Repositories;
+namespace Modules\Academic\App\Repositories;
 
 use Modules\Academic\App\Models\SessionTime;
 use Prettus\Repository\Eloquent\BaseRepository;
@@ -9,6 +9,6 @@ class SessionTimeRepository extends BaseRepository
 {
     public function model()
     {
-        return SessionTime::class ; 
+        return SessionTime::class;
     }
 }

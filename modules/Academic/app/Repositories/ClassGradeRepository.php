@@ -13,8 +13,11 @@ class ClassGradeRepository extends BaseRepository
         return  ClassGrade::class;
     }
 
-    public function create(array $data): ClassGrade
+    /**
+     * Find class grade by ID
+     */
+    public function findById($id)
     {
-        return $this->model->create($data);
+        return $this->find($id);
     }
 }

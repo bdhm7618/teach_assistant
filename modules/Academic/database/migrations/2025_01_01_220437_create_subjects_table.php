@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->string('code');
             $table->integer('credits')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->foreignId('channel_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
+            
+            // Make code unique within channel (allowing null channel_id for general subjects)
+            $table->unique(['code', 'channel_id']);
         });
     }
 

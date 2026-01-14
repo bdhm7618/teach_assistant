@@ -40,27 +40,40 @@ class BelongsToChannel implements ValidationRule
             return; // Skip if value is empty (let required rule handle it)
         }
 
+        // Ensure value is numeric (integer)
+        if (!is_numeric($value)) {
+            $fail(trans('channel::app.validation.model_not_belongs_to_channel'), null);
+            return;
+        }
+
+        $value = (int) $value;
+
         // Check if model uses HasChannelScope trait
         $usesChannelScope = in_array(
             \Modules\Channel\App\Traits\HasChannelScope::class,
             class_uses_recursive($this->modelClass)
         );
 
-        if ($usesChannelScope) {
-            // Use withoutChannelScope to bypass global scope
-            $model = $this->modelClass::withoutChannelScope()
-                ->where('id', $value)
-                ->where('channel_id', $this->channelId)
-                ->first();
-        } else {
-            // Model doesn't use channel scope, check directly
-            $model = $this->modelClass::where('id', $value)
-                ->where('channel_id', $this->channelId)
-                ->first();
-        }
+        try {
+            if ($usesChannelScope) {
+                // Use withoutChannelScope to bypass global scope
+                $model = $this->modelClass::withoutChannelScope()
+                    ->where('id', $value)
+                    ->where('channel_id', $this->channelId)
+                    ->first();
+            } else {
+                // Model doesn't use channel scope, check directly
+                $model = $this->modelClass::where('id', $value)
+                    ->where('channel_id', $this->channelId)
+                    ->first();
+            }
 
-        if (!$model) {
-            $modelName = class_basename($this->modelClass);
+            if (!$model) {
+                $modelName = class_basename($this->modelClass);
+                $fail(trans('channel::app.validation.model_not_belongs_to_channel'), null);
+            }
+        } catch (\Exception $e) {
+            // If there's a database error (e.g., column doesn't exist), fail validation
             $fail(trans('channel::app.validation.model_not_belongs_to_channel'), null);
         }
     }

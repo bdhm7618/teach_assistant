@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Prettus\Repository\Eloquent\BaseRepository;
+use OpenApi\Attributes as OA;
 
 abstract class BaseController extends Controller
 {
@@ -30,6 +31,29 @@ abstract class BaseController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    #[OA\Get(
+        path: "/api/v1/{resource}",
+        summary: "Get list of resources",
+        tags: ["Resources"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "limit",
+                in: "query",
+                required: false,
+                schema: new OA\Schema(type: "integer", default: 10),
+                example: 10
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of resources",
+                content: new OA\JsonContent(ref: "#/components/schemas/SuccessResponse")
+            ),
+            new OA\Response(response: 401, description: "Unauthorized")
+        ]
+    )]
     public function index(Request $request)
     {
         try {
@@ -66,6 +90,30 @@ abstract class BaseController extends Controller
      * @param int|string $id
      * @return \Illuminate\Http\JsonResponse
      */
+    #[OA\Get(
+        path: "/api/v1/{resource}/{id}",
+        summary: "Get a specific resource",
+        tags: ["Resources"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer"),
+                example: 1
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Resource details",
+                content: new OA\JsonContent(ref: "#/components/schemas/SuccessResponse")
+            ),
+            new OA\Response(response: 401, description: "Unauthorized"),
+            new OA\Response(response: 404, description: "Not found")
+        ]
+    )]
     public function show($id)
     {
         try {
