@@ -36,8 +36,9 @@ class ChannelScope implements Scope
         $channelId = $this->getChannelId();
         
         if ($channelId !== null) {
-            // For subjects, include both channel-specific and general subjects (channel_id = null)
-            if ($model instanceof \Modules\Academic\App\Models\Subject) {
+            // For subjects and roles, include both channel-specific and general (channel_id = null)
+            if ($model instanceof \Modules\Academic\App\Models\Subject || 
+                $model instanceof \Modules\Channel\App\Models\Role) {
                 $builder->where(function ($query) use ($channelId) {
                     $query->where('channel_id', $channelId)
                           ->orWhereNull('channel_id');

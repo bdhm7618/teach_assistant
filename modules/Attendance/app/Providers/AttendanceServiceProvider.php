@@ -1,12 +1,14 @@
 <?php
 
-namespace Modules\Attendance\Providers;
+namespace Modules\Attendance\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Modules\Attendance\App\Providers\EventServiceProvider;
+use Modules\Attendance\App\Providers\RouteServiceProvider;
 
 class AttendanceServiceProvider extends ServiceProvider
 {

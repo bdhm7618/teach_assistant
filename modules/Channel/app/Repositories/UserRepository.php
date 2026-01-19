@@ -2,9 +2,7 @@
 
 namespace Modules\Channel\App\Repositories;
 
-
 use Illuminate\Support\Facades\Hash;
-use Modules\Channel\App\Models\Role;
 use Modules\Channel\App\Models\User;
 use Prettus\Repository\Eloquent\BaseRepository;
 
@@ -15,21 +13,62 @@ class UserRepository extends BaseRepository
         return User::class;
     }
 
-    public function create(array $data)
+    /**
+     * Create a new user in the current channel.
+     *
+     * @param array $data
+     * @return User
+     */
+    public function create(array $data): User
     {
-        $data['password'] = Hash::make($data['password']);
-        $data['role_id'] = Role::where('name', 'owner')->first()?->id;
-        $user = $this->model->create($data);
-        return $user;
+        // Hash password if provided
+        if (isset($data['password']) && !empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        // Ensure channel_id is set (should be set by request validation)
+        if (!isset($data['channel_id'])) {
+            $data['channel_id'] = auth('user')->user()?->channel_id;
+        }
+
+        return $this->model->create($data);
     }
 
-    public function update(array $data, $id)
+    /**
+     * Update a user.
+     *
+     * @param array $data
+     * @param int $id
+     * @return User
+     */
+    public function update(array $data, $id): User
     {
-        return $this->model->find($id)->update($data);
+        // Hash password if provided
+        if (isset($data['password']) && !empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            // Remove password from data if not provided
+            unset($data['password']);
+        }
+
+        // Use withoutChannelScope to find user by ID regardless of channel
+        // Channel validation is handled in the Request
+        $user = $this->model->withoutChannelScope()->findOrFail($id);
+        $user->update($data);
+        return $user->fresh();
     }
 
-    public function delete($id)
+    /**
+     * Delete a user.
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function delete($id): bool
     {
-        return $this->model->find($id)->delete();
+        // Use withoutChannelScope to find user by ID regardless of channel
+        // Channel validation is handled in the Controller
+        $user = $this->model->withoutChannelScope()->findOrFail($id);
+        return $user->delete();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Attendance\Providers;
+namespace Modules\Attendance\App\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -25,17 +25,6 @@ class RouteServiceProvider extends ServiceProvider
     public function map(): void
     {
         $this->mapApiRoutes();
-        $this->mapWebRoutes();
-    }
-
-    /**
-     * Define the "web" routes for the application.
-     *
-     * These routes all receive session state, CSRF protection, etc.
-     */
-    protected function mapWebRoutes(): void
-    {
-        Route::middleware('web')->group(module_path($this->name, '/routes/web.php'));
     }
 
     /**
@@ -45,6 +34,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        Route::middleware('api')->prefix('api')->name('api.')->group(module_path($this->name, '/routes/api.php'));
+        $apiV1Path = module_path($this->name, '/routes/api-v1.php');
+        if (file_exists($apiV1Path)) {
+            Route::middleware('api')->group($apiV1Path);
+        }
     }
 }

@@ -3,14 +3,16 @@
 namespace Modules\Channel\App\Models;
 
 use Modules\Core\App\Models\Otp;
+use Modules\Channel\App\Traits\HasChannelScope;
+use Modules\Channel\App\Traits\HasPermissions;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends  Authenticatable implements JWTSubject
+class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory, HasChannelScope, HasPermissions;
 
     public function getJWTIdentifier()  
     {
