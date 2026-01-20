@@ -58,4 +58,43 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->morphMany(Otp::class, 'otpable');
     }
+
+    /**
+     * Get the groups this user is assigned to (as teacher, assistant, etc.)
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(
+            \Modules\Academic\App\Models\Group::class,
+            'group_users',
+            'user_id',
+            'group_id'
+        )->withPivot(['role_type', 'status', 'joined_at', 'notes'])
+          ->withTimestamps()
+          ->using(\Modules\Academic\App\Models\GroupUser::class);
+    }
+
+    /**
+     * Get groups where user is a teacher
+     */
+    public function teachingGroups()
+    {
+        return $this->groups()->wherePivot('role_type', 'teacher')->wherePivot('status', 'active');
+    }
+
+    /**
+     * Get groups where user is an assistant
+     */
+    public function assistingGroups()
+    {
+        return $this->groups()->wherePivot('role_type', 'assistant')->wherePivot('status', 'active');
+    }
+
+    /**
+     * Get group users relationship (direct)
+     */
+    public function groupUsers()
+    {
+        return $this->hasMany(\Modules\Academic\App\Models\GroupUser::class);
+    }
 }

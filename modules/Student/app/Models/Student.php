@@ -59,6 +59,22 @@ class Student extends Authenticatable
     }
 
     /**
+     * Get the enrollments for this student
+     */
+    public function enrollments()
+    {
+        return $this->hasMany(\Modules\Academic\App\Models\StudentEnrollment::class);
+    }
+
+    /**
+     * Get active enrollments for this student
+     */
+    public function activeEnrollments()
+    {
+        return $this->hasMany(\Modules\Academic\App\Models\StudentEnrollment::class)->where('status', 'active');
+    }
+
+    /**
      * Get the channel that owns the student
      */
     public function channel()

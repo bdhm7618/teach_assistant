@@ -58,4 +58,67 @@ class Group extends Model
         return $this->belongsToMany(\Modules\Student\App\Models\Student::class, 'group_students', 'group_id', 'student_id')
             ->withTimestamps();
     }
+
+    /**
+     * Get the student enrollments for this group
+     */
+    public function enrollments()
+    {
+        return $this->hasMany(StudentEnrollment::class);
+    }
+
+    /**
+     * Get active enrollments for this group
+     */
+    public function activeEnrollments()
+    {
+        return $this->hasMany(StudentEnrollment::class)->where('status', 'active');
+    }
+
+    /**
+     * Get the users (teachers, assistants, helpers) in this group
+     */
+    public function users()
+    {
+        return $this->belongsToMany(
+            \Modules\Channel\App\Models\User::class,
+            'group_users',
+            'group_id',
+            'user_id'
+        )->withPivot(['role_type', 'status', 'joined_at', 'notes'])
+          ->withTimestamps()
+          ->using(GroupUser::class);
+    }
+
+    /**
+     * Get teachers in this group
+     */
+    public function teachers()
+    {
+        return $this->users()->wherePivot('role_type', 'teacher')->wherePivot('status', 'active');
+    }
+
+    /**
+     * Get assistants in this group
+     */
+    public function assistants()
+    {
+        return $this->users()->wherePivot('role_type', 'assistant')->wherePivot('status', 'active');
+    }
+
+    /**
+     * Get helpers in this group
+     */
+    public function helpers()
+    {
+        return $this->users()->wherePivot('role_type', 'helper')->wherePivot('status', 'active');
+    }
+
+    /**
+     * Get group users relationship (direct)
+     */
+    public function groupUsers()
+    {
+        return $this->hasMany(GroupUser::class);
+    }
 }
