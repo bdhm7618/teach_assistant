@@ -36,14 +36,15 @@ class GroupMetadataController extends Controller
             $classGrades = $this->classGradeRepository->makeModel()
                 ->where('channel_id', $channelId)
                 ->where('is_active', true)
-                ->select('id', 'grade_level', 'stage')
+                ->with('level')
                 ->get()
                 ->map(function ($classGrade) {
+                    $level = $classGrade->level;
                     return [
                         'id' => $classGrade->id,
-                        'name' => "Grade {$classGrade->grade_level} - " . ucfirst($classGrade->stage),
-                        'grade_level' => $classGrade->grade_level,
-                        'stage' => $classGrade->stage,
+                        'name' => $level ? ($level->level_number ? "Grade {$level->level_number} - " . ucfirst($level->stage) : $level->name) : ($classGrade->name ?? 'N/A'),
+                        'level_number' => $level->level_number ?? null,
+                        'stage' => $level->stage ?? null,
                     ];
                 });
 

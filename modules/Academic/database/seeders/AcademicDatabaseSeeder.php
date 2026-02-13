@@ -11,6 +11,8 @@ class AcademicDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call([]);
+        $this->call([
+            DefaultLevelsSeeder::class,
+        ]);
     }
 }

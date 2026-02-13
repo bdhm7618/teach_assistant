@@ -11,11 +11,10 @@ class ClassGrade extends Model
     protected $table = 'class_grades';
 
     protected $fillable = [
-        'grade_level',
-        'stage',
+        'name',
+        'level_id',
         'is_active',
         'channel_id',
-        "academic_year_id"
     ];
 
 
@@ -24,8 +23,28 @@ class ClassGrade extends Model
         return $this->hasMany(Group::class, 'class_id');
     }
 
-    public function academicYear()
+    /**
+     * Get the level for this class grade
+     */
+    public function level()
     {
-        return $this->belongsTo(AcademicYear::class);
+        return $this->belongsTo(Level::class);
+    }
+
+    /**
+     * Get the display name for the class grade
+     * Returns name if available, otherwise returns level name
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        if ($this->name) {
+            return $this->name;
+        }
+
+        if ($this->level) {
+            return $this->level->name;
+        }
+
+        return 'Class Grade #' . $this->id;
     }
 }

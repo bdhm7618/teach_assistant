@@ -280,11 +280,6 @@ http://your-domain.com/api/v1
 #### Academic Endpoints
 
 ```
-GET    /academic/academic-years          # List academic years
-POST   /academic/academic-years          # Create academic year
-GET    /academic/academic-years/{id}     # Get academic year
-PUT    /academic/academic-years/{id}     # Update academic year
-
 GET    /academic/class-grades             # List class grades
 POST   /academic/class-grades             # Create class grade
 GET    /academic/class-grades/{id}        # Get class grade
@@ -347,9 +342,9 @@ class YourRequest extends BaseRequest
 2. **Use belongsToChannel** to validate model ownership:
 
 ```php
-'academic_year_id' => [
+'subject_id' => [
     'required',
-    $this->belongsToChannel(AcademicYear::class),
+    $this->belongsToChannel(Subject::class),
 ],
 ```
 

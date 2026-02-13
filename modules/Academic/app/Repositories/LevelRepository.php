@@ -2,15 +2,14 @@
 
 namespace Modules\Academic\App\Repositories;
 
-use Modules\Academic\App\Models\AcademicYear;
+use Modules\Academic\App\Models\Level;
 use Prettus\Repository\Eloquent\BaseRepository;
 
-
-class AcademicYearRepository extends BaseRepository
+class LevelRepository extends BaseRepository
 {
     public function model()
     {
-        return AcademicYear::class;
+        return Level::class;
     }
 
     public function create(array $data)
@@ -18,3 +17,4 @@ class AcademicYearRepository extends BaseRepository
         return $this->model->create($data);
     }
 }
+

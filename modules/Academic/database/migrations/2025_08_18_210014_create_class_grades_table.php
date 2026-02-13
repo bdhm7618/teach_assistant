@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('class_grades', function (Blueprint $table) {
             $table->id();
-            $table->unsignedTinyInteger('grade_level'); // 1 → 12
-            $table->enum('stage', ['primary', 'preparatory', 'secondary']);
+            $table->string('name')->nullable();
+            $table->foreignId('level_id')->constrained()->cascadeOnDelete();
             $table->boolean('is_active')->default(true);
             $table->foreignId('channel_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['channel_id', 'grade_level', 'stage']);
+            $table->unique(['channel_id', 'level_id'], 'class_grades_channel_level_unique');
         });
     }
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classes');
+        Schema::dropIfExists('class_grades');
     }
 };

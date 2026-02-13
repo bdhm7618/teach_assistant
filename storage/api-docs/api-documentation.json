@@ -104,17 +104,29 @@
                 }
             }
         },
-        "/api/v1/academic/academic-years": {
+        "/api/v1/academic/levels": {
             "get": {
                 "tags": [
-                    "Academic - Academic Years"
+                    "Academic - Levels"
                 ],
-                "summary": "Get Academic years",
-                "description": "Retrieve resource",
-                "operationId": "get_Api_V1_Academic_Academic_years",
+                "summary": "Get available levels",
+                "description": "Retrieve list of levels available for the current channel (includes system defaults and channel-specific levels)",
+                "operationId": "get_Api_V1_Academic_Levels",
                 "security": [
                     {
                         "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "include_defaults",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "description": "Include system default levels"
                     }
                 ],
                 "responses": {
@@ -123,82 +135,42 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Operation successful"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                }
-                                            }
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/SuccessResponse"
                                 },
                                 "example": {
                                     "status": "success",
-                                    "message": "Operation successful",
-                                    "data": {
-                                        "id": 1,
-                                        "name": "Example",
-                                        "created_at": "2024-01-01 00:00:00",
-                                        "updated_at": "2024-01-01 00:00:00"
-                                    }
+                                    "message": "Levels retrieved successfully",
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "name": "1 Primary",
+                                            "code": "PRIM-1",
+                                            "level_number": 1,
+                                            "stage": "primary",
+                                            "description": "Default level for 1 Primary",
+                                            "is_active": true,
+                                            "is_default": true,
+                                            "channel_id": null,
+                                            "created_at": "2024-01-01 00:00:00",
+                                            "updated_at": "2024-01-01 00:00:00"
+                                        }
+                                    ]
                                 }
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                },
-                                "example": {
-                                    "status": "error",
-                                    "message": "Validation failed",
-                                    "errors": {
-                                        "field": [
-                                            "The field is required."
-                                        ]
-                                    }
-                                }
-                            }
-                        }
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             },
             "post": {
                 "tags": [
-                    "Academic - Academic Years"
+                    "Academic - Levels"
                 ],
-                "summary": "Post Academic years",
-                "description": "Create resource",
-                "operationId": "post_Api_V1_Academic_Academic_years",
+                "summary": "Create a new level",
+                "description": "Create a new channel-specific level. System default levels cannot be created via API.",
+                "operationId": "post_Api_V1_Academic_Levels",
                 "security": [
                     {
                         "bearerAuth": []
@@ -211,92 +183,88 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "name",
-                                    "start_year",
-                                    "end_year"
+                                    "name"
                                 ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "maxLength": 255
+                                        "maxLength": 255,
+                                        "description": "Level name (e.g., 'Beginner Python', 'Advanced Math')"
                                     },
-                                    "start_year": {
-                                        "type": "integer",
-                                        "minLength": 1900,
-                                        "maxLength": 2100
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "nullable": true,
+                                        "description": "Optional code for reference"
                                     },
-                                    "end_year": {
+                                    "level_number": {
                                         "type": "integer",
-                                        "minLength": 1900,
-                                        "maxLength": 2100
+                                        "minimum": 1,
+                                        "maximum": 12,
+                                        "nullable": true,
+                                        "description": "Level number for academic levels (1-12)"
+                                    },
+                                    "stage": {
+                                        "type": "string",
+                                        "enum": [
+                                            "primary",
+                                            "preparatory",
+                                            "secondary"
+                                        ],
+                                        "nullable": true,
+                                        "description": "Stage for academic levels"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "nullable": true,
+                                        "description": "Optional description"
                                     },
                                     "is_active": {
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },
                             "example": {
-                                "name": "John Doe",
-                                "start_year": 2024,
-                                "end_year": 2025,
+                                "name": "Beginner Python",
+                                "code": "PY-BEG",
+                                "description": "Python programming for beginners",
                                 "is_active": true
                             }
                         }
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": "Success",
+                    "201": {
+                        "description": "Level created successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Operation successful"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                }
-                                            }
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/SuccessResponse"
                                 },
                                 "example": {
                                     "status": "success",
-                                    "message": "Operation successful",
+                                    "message": "Level created successfully",
                                     "data": {
-                                        "id": 1,
-                                        "name": "Example",
+                                        "id": 13,
+                                        "name": "Beginner Python",
+                                        "code": "PY-BEG",
+                                        "level_number": null,
+                                        "stage": null,
+                                        "description": "Python programming for beginners",
+                                        "is_active": true,
+                                        "is_default": false,
+                                        "channel_id": 1,
                                         "created_at": "2024-01-01 00:00:00",
                                         "updated_at": "2024-01-01 00:00:00"
                                     }
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "422": {
                         "description": "Validation error",
@@ -304,68 +272,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
-                                },
-                                "example": {
-                                    "status": "error",
-                                    "message": "Validation failed",
-                                    "errors": {
-                                        "field": [
-                                            "The field is required."
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "201": {
-                        "description": "Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Operation successful"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "status": "success",
-                                    "message": "Resource created successfully",
-                                    "data": {
-                                        "id": 1,
-                                        "name": "Example",
-                                        "created_at": "2024-01-01 00:00:00",
-                                        "updated_at": "2024-01-01 00:00:00"
-                                    }
                                 }
                             }
                         }
@@ -373,14 +279,14 @@
                 }
             }
         },
-        "/api/v1/academic/academic-years/{academic_year}": {
+        "/api/v1/academic/levels/{level}": {
             "get": {
                 "tags": [
-                    "Academic - Academic Years"
+                    "Academic - Levels"
                 ],
-                "summary": "Get {academic_year}",
-                "description": "Retrieve resource",
-                "operationId": "get_Api_V1_Academic_Academic_years_academic_year",
+                "summary": "Get level details",
+                "description": "Retrieve details of a specific level",
+                "operationId": "get_Api_V1_Academic_Levels_level",
                 "security": [
                     {
                         "bearerAuth": []
@@ -388,13 +294,13 @@
                 ],
                 "parameters": [
                     {
-                        "name": "academic_year",
+                        "name": "level",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "integer"
                         },
-                        "description": "The academic_year identifier"
+                        "description": "The level identifier"
                     }
                 ],
                 "responses": {
@@ -403,47 +309,21 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Operation successful"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                }
-                                            }
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/SuccessResponse"
                                 },
                                 "example": {
                                     "status": "success",
-                                    "message": "Operation successful",
+                                    "message": "Level retrieved successfully",
                                     "data": {
                                         "id": 1,
-                                        "name": "Example",
+                                        "name": "1 Primary",
+                                        "code": "PRIM-1",
+                                        "level_number": 1,
+                                        "stage": "primary",
+                                        "description": "Default level for 1 Primary",
+                                        "is_active": true,
+                                        "is_default": true,
+                                        "channel_id": null,
                                         "created_at": "2024-01-01 00:00:00",
                                         "updated_at": "2024-01-01 00:00:00"
                                     }
@@ -451,34 +331,21 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                },
-                                "example": {
-                                    "status": "error",
-                                    "message": "Validation failed",
-                                    "errors": {
-                                        "field": [
-                                            "The field is required."
-                                        ]
-                                    }
-                                }
-                            }
-                        }
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Level not found"
                     }
                 }
             },
             "put": {
                 "tags": [
-                    "Academic - Academic Years"
+                    "Academic - Levels"
                 ],
-                "summary": "Put {academic_year}",
-                "description": "Update resource",
-                "operationId": "put_Api_V1_Academic_Academic_years_academic_year",
+                "summary": "Update a level",
+                "description": "Update level information. System default levels cannot be modified.",
+                "operationId": "put_Api_V1_Academic_Levels_level",
                 "security": [
                     {
                         "bearerAuth": []
@@ -486,13 +353,13 @@
                 ],
                 "parameters": [
                     {
-                        "name": "academic_year",
+                        "name": "level",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "integer"
                         },
-                        "description": "The academic_year identifier"
+                        "description": "The level identifier"
                     }
                 ],
                 "requestBody": {
@@ -502,24 +369,37 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "name",
-                                    "start_year",
-                                    "end_year"
+                                    "name"
                                 ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
                                         "maxLength": 255
                                     },
-                                    "start_year": {
-                                        "type": "integer",
-                                        "minLength": 1900,
-                                        "maxLength": 2100
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "nullable": true
                                     },
-                                    "end_year": {
+                                    "level_number": {
                                         "type": "integer",
-                                        "minLength": 1900,
-                                        "maxLength": 2100
+                                        "minimum": 1,
+                                        "maximum": 12,
+                                        "nullable": true
+                                    },
+                                    "stage": {
+                                        "type": "string",
+                                        "enum": [
+                                            "primary",
+                                            "preparatory",
+                                            "secondary"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "nullable": true
                                     },
                                     "is_active": {
                                         "type": "boolean"
@@ -527,67 +407,50 @@
                                 }
                             },
                             "example": {
-                                "name": "John Doe",
-                                "start_year": 2024,
-                                "end_year": 2025,
-                                "is_active": true
+                                "name": "Beginner Python Updated",
+                                "code": "PY-BEG-UPD",
+                                "description": "Updated Python programming for beginners",
+                                "is_active": false
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Success",
+                        "description": "Level updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Operation successful"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                }
-                                            }
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/SuccessResponse"
                                 },
                                 "example": {
                                     "status": "success",
-                                    "message": "Operation successful",
+                                    "message": "Level updated successfully",
                                     "data": {
-                                        "id": 1,
-                                        "name": "Example",
+                                        "id": 13,
+                                        "name": "Beginner Python Updated",
+                                        "code": "PY-BEG-UPD",
+                                        "level_number": null,
+                                        "stage": null,
+                                        "description": "Updated Python programming for beginners",
+                                        "is_active": false,
+                                        "is_default": false,
+                                        "channel_id": 1,
                                         "created_at": "2024-01-01 00:00:00",
                                         "updated_at": "2024-01-01 00:00:00"
                                     }
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Cannot edit system default level"
+                    },
+                    "404": {
+                        "description": "Level not found"
                     },
                     "422": {
                         "description": "Validation error",
@@ -595,68 +458,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
-                                },
-                                "example": {
-                                    "status": "error",
-                                    "message": "Validation failed",
-                                    "errors": {
-                                        "field": [
-                                            "The field is required."
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "201": {
-                        "description": "Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Operation successful"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "status": "success",
-                                    "message": "Resource created successfully",
-                                    "data": {
-                                        "id": 1,
-                                        "name": "Example",
-                                        "created_at": "2024-01-01 00:00:00",
-                                        "updated_at": "2024-01-01 00:00:00"
-                                    }
                                 }
                             }
                         }
@@ -665,11 +466,11 @@
             },
             "patch": {
                 "tags": [
-                    "Academic - Academic Years"
+                    "Academic - Levels"
                 ],
-                "summary": "Patch {academic_year}",
-                "description": "Update resource",
-                "operationId": "patch_Api_V1_Academic_Academic_years_academic_year",
+                "summary": "Update a level (partial)",
+                "description": "Partially update level information. System default levels cannot be modified.",
+                "operationId": "patch_Api_V1_Academic_Levels_level",
                 "security": [
                     {
                         "bearerAuth": []
@@ -677,13 +478,13 @@
                 ],
                 "parameters": [
                     {
-                        "name": "academic_year",
+                        "name": "level",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "integer"
                         },
-                        "description": "The academic_year identifier"
+                        "description": "The level identifier"
                     }
                 ],
                 "requestBody": {
@@ -692,25 +493,35 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": [
-                                    "name",
-                                    "start_year",
-                                    "end_year"
-                                ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
                                         "maxLength": 255
                                     },
-                                    "start_year": {
-                                        "type": "integer",
-                                        "minLength": 1900,
-                                        "maxLength": 2100
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "nullable": true
                                     },
-                                    "end_year": {
+                                    "level_number": {
                                         "type": "integer",
-                                        "minLength": 1900,
-                                        "maxLength": 2100
+                                        "minimum": 1,
+                                        "maximum": 12,
+                                        "nullable": true
+                                    },
+                                    "stage": {
+                                        "type": "string",
+                                        "enum": [
+                                            "primary",
+                                            "preparatory",
+                                            "secondary"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "nullable": true
                                     },
                                     "is_active": {
                                         "type": "boolean"
@@ -718,67 +529,30 @@
                                 }
                             },
                             "example": {
-                                "name": "John Doe",
-                                "start_year": 2024,
-                                "end_year": 2025,
-                                "is_active": true
+                                "is_active": false
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Success",
+                        "description": "Level updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Operation successful"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2024-01-01 00:00:00"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "status": "success",
-                                    "message": "Operation successful",
-                                    "data": {
-                                        "id": 1,
-                                        "name": "Example",
-                                        "created_at": "2024-01-01 00:00:00",
-                                        "updated_at": "2024-01-01 00:00:00"
-                                    }
+                                    "$ref": "#/components/schemas/SuccessResponse"
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Cannot edit system default level"
+                    },
+                    "404": {
+                        "description": "Level not found"
                     },
                     "422": {
                         "description": "Validation error",
@@ -786,15 +560,66 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Academic - Levels"
+                ],
+                "summary": "Delete a level",
+                "description": "Delete a level. System default levels and levels in use by class grades cannot be deleted.",
+                "operationId": "delete_Api_V1_Academic_Levels_level",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "level",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "The level identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Level deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
                                 },
                                 "example": {
-                                    "status": "error",
-                                    "message": "Validation failed",
-                                    "errors": {
-                                        "field": [
-                                            "The field is required."
-                                        ]
-                                    }
+                                    "status": "success",
+                                    "message": "Level deleted successfully",
+                                    "data": null
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Cannot delete system default level"
+                    },
+                    "404": {
+                        "description": "Level not found"
+                    },
+                    "409": {
+                        "description": "Level is in use by class grades",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -909,26 +734,18 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "grade_level",
-                                    "stage",
-                                    "academic_year_id"
+                                    "level_id"
                                 ],
                                 "properties": {
-                                    "grade_level": {
+                                    "level_id": {
                                         "type": "integer",
-                                        "minLength": 1,
-                                        "maxLength": 12
+                                        "description": "ID of the level to associate with this class grade"
                                     },
-                                    "stage": {
+                                    "name": {
                                         "type": "string",
-                                        "enum": [
-                                            "primary",
-                                            "preparatory",
-                                            "secondary"
-                                        ]
-                                    },
-                                    "academic_year_id": {
-                                        "type": "string"
+                                        "maxLength": 255,
+                                        "nullable": true,
+                                        "description": "Optional name for the class grade"
                                     },
                                     "is_active": {
                                         "type": "boolean"
@@ -936,9 +753,8 @@
                                 }
                             },
                             "example": {
-                                "grade_level": 1,
-                                "stage": "primary",
-                                "academic_year_id": 1,
+                                "level_id": 1,
+                                "name": "Class A",
                                 "is_active": true
                             }
                         }
@@ -1202,26 +1018,18 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "grade_level",
-                                    "stage",
-                                    "academic_year_id"
+                                    "level_id"
                                 ],
                                 "properties": {
-                                    "grade_level": {
+                                    "level_id": {
                                         "type": "integer",
-                                        "minLength": 1,
-                                        "maxLength": 12
+                                        "description": "ID of the level to associate with this class grade"
                                     },
-                                    "stage": {
+                                    "name": {
                                         "type": "string",
-                                        "enum": [
-                                            "primary",
-                                            "preparatory",
-                                            "secondary"
-                                        ]
-                                    },
-                                    "academic_year_id": {
-                                        "type": "string"
+                                        "maxLength": 255,
+                                        "nullable": true,
+                                        "description": "Optional name for the class grade"
                                     },
                                     "is_active": {
                                         "type": "boolean"
@@ -1229,9 +1037,8 @@
                                 }
                             },
                             "example": {
-                                "grade_level": 1,
-                                "stage": "primary",
-                                "academic_year_id": 1,
+                                "level_id": 1,
+                                "name": "Class A",
                                 "is_active": true
                             }
                         }
@@ -1395,26 +1202,18 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "grade_level",
-                                    "stage",
-                                    "academic_year_id"
+                                    "level_id"
                                 ],
                                 "properties": {
-                                    "grade_level": {
+                                    "level_id": {
                                         "type": "integer",
-                                        "minLength": 1,
-                                        "maxLength": 12
+                                        "description": "ID of the level to associate with this class grade"
                                     },
-                                    "stage": {
+                                    "name": {
                                         "type": "string",
-                                        "enum": [
-                                            "primary",
-                                            "preparatory",
-                                            "secondary"
-                                        ]
-                                    },
-                                    "academic_year_id": {
-                                        "type": "string"
+                                        "maxLength": 255,
+                                        "nullable": true,
+                                        "description": "Optional name for the class grade"
                                     },
                                     "is_active": {
                                         "type": "boolean"
@@ -1422,9 +1221,8 @@
                                 }
                             },
                             "example": {
-                                "grade_level": 1,
-                                "stage": "primary",
-                                "academic_year_id": 1,
+                                "level_id": 1,
+                                "name": "Class A",
                                 "is_active": true
                             }
                         }
@@ -6143,11 +5941,17 @@
         },
         "/api/v1/attendances": {
             "get": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Get list of attendance records",
                 "description": "Retrieve resource",
                 "operationId": "get_Api_V1_Attendances",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "limit",
@@ -6177,18 +5981,29 @@
                 }
             },
             "post": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Create a new attendance record",
                 "description": "Create resource",
                 "operationId": "post_Api_V1_Attendances",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["student_id", "group_id", "date", "status"],
+                                "required": [
+                                    "student_id",
+                                    "group_id",
+                                    "date",
+                                    "status"
+                                ],
                                 "properties": {
                                     "student_id": {
                                         "type": "integer",
@@ -6210,7 +6025,12 @@
                                     },
                                     "status": {
                                         "type": "string",
-                                        "enum": ["present", "absent", "late", "excused"],
+                                        "enum": [
+                                            "present",
+                                            "absent",
+                                            "late",
+                                            "excused"
+                                        ],
                                         "example": "present"
                                     },
                                     "notes": {
@@ -6252,11 +6072,17 @@
         },
         "/api/v1/attendances/{id}": {
             "get": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Get a specific attendance record",
                 "description": "Retrieve resource",
                 "operationId": "get_Api_V1_Attendances_Id",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "id",
@@ -6288,11 +6114,17 @@
                 }
             },
             "put": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Update an attendance record",
                 "description": "Update resource",
                 "operationId": "put_Api_V1_Attendances_Id",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "id",
@@ -6313,7 +6145,12 @@
                                 "properties": {
                                     "status": {
                                         "type": "string",
-                                        "enum": ["present", "absent", "late", "excused"]
+                                        "enum": [
+                                            "present",
+                                            "absent",
+                                            "late",
+                                            "excused"
+                                        ]
                                     },
                                     "notes": {
                                         "type": "string",
@@ -6354,11 +6191,17 @@
                 }
             },
             "delete": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Delete an attendance record",
                 "description": "Delete resource",
                 "operationId": "delete_Api_V1_Attendances_Id",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "id",
@@ -6392,24 +6235,37 @@
         },
         "/api/v1/attendances/bulk": {
             "post": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Bulk create attendance records",
                 "description": "Create multiple attendance records at once",
                 "operationId": "post_Api_V1_Attendances_Bulk",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["attendances"],
+                                "required": [
+                                    "attendances"
+                                ],
                                 "properties": {
                                     "attendances": {
                                         "type": "array",
                                         "items": {
                                             "type": "object",
-                                            "required": ["student_id", "group_id", "date", "status"],
+                                            "required": [
+                                                "student_id",
+                                                "group_id",
+                                                "date",
+                                                "status"
+                                            ],
                                             "properties": {
                                                 "student_id": {
                                                     "type": "integer"
@@ -6427,7 +6283,12 @@
                                                 },
                                                 "status": {
                                                     "type": "string",
-                                                    "enum": ["present", "absent", "late", "excused"]
+                                                    "enum": [
+                                                        "present",
+                                                        "absent",
+                                                        "late",
+                                                        "excused"
+                                                    ]
                                                 },
                                                 "notes": {
                                                     "type": "string",
@@ -6470,11 +6331,17 @@
         },
         "/api/v1/attendances/statistics/student/{studentId}": {
             "get": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Get attendance statistics for a student",
                 "description": "Retrieve attendance statistics for a specific student",
                 "operationId": "get_Api_V1_Attendances_Statistics_Student_StudentId",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "studentId",
@@ -6535,11 +6402,17 @@
         },
         "/api/v1/attendances/statistics/group/{groupId}": {
             "get": {
-                "tags": ["Attendance"],
+                "tags": [
+                    "Attendance"
+                ],
                 "summary": "Get attendance statistics for a group",
                 "description": "Retrieve attendance statistics for a specific group",
                 "operationId": "get_Api_V1_Attendances_Statistics_Group_GroupId",
-                "security": [{"bearerAuth": []}],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "groupId",
@@ -6852,7 +6725,12 @@
                     },
                     "status": {
                         "type": "string",
-                        "enum": ["present", "absent", "late", "excused"],
+                        "enum": [
+                            "present",
+                            "absent",
+                            "late",
+                            "excused"
+                        ],
                         "example": "present"
                     },
                     "status_label": {
@@ -6886,10 +6764,6 @@
     },
     "tags": [
         {
-            "name": "Academic - Academic Years",
-            "description": "Academic Years operations in Academic package"
-        },
-        {
             "name": "Academic - Class Grades",
             "description": "Class Grades operations in Academic package"
         },
@@ -6904,6 +6778,10 @@
         {
             "name": "Academic - Subjects",
             "description": "Subjects operations in Academic package"
+        },
+        {
+            "name": "Academic - Levels",
+            "description": "Levels operations in Academic package"
         },
         {
             "name": "Channel - Channels",

@@ -92,10 +92,6 @@ In Swagger UI, you can enter the token in the "Authorize" button at the top of t
 - `POST /api/v1/channel/user/reset-password` - Reset password with OTP
 
 ### Academic Endpoints
-- `GET /api/v1/academic/academic-years` - List academic years
-- `POST /api/v1/academic/academic-years` - Create academic year
-- `GET /api/v1/academic/academic-years/{id}` - Get academic year details
-- `PUT /api/v1/academic/academic-years/{id}` - Update academic year
 - `GET /api/v1/academic/class-grades` - List class grades
 - `POST /api/v1/academic/class-grades` - Create class grade
 - `GET /api/v1/academic/class-grades/{id}` - Get class grade details
@@ -160,7 +156,7 @@ curl -X POST http://your-domain/api/v1/channel/user/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
 
-# Example: Get academic years (with token)
-curl -X GET http://your-domain/api/v1/academic/academic-years \
+# Example: Get class grades (with token)
+curl -X GET http://your-domain/api/v1/academic/class-grades \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```

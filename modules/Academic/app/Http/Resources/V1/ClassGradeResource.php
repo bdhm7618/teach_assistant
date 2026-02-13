@@ -11,9 +11,15 @@ class ClassGradeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'grade_level' => $this->grade_level,
-            'stage' => $this->stage,
-            'academic_year_id' => $this->academic_year_id,
+            'name' => $this->name,
+            'level_id' => $this->level_id,
+            'level' => $this->whenLoaded('level', fn() => [
+                'id' => $this->level->id,
+                'name' => $this->level->name,
+                'code' => $this->level->code,
+                'level_number' => $this->level->level_number,
+                'stage' => $this->level->stage,
+            ]),
             'is_active' => $this->is_active,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),

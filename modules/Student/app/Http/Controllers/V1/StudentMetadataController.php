@@ -27,18 +27,19 @@ class StudentMetadataController extends Controller
             $groups = $this->groupRepository->makeModel()
                 ->where('channel_id', $channelId)
                 ->where('is_active', true)
-                ->with(['classGrade', 'subject'])
+                ->with(['classGrade.level', 'subject'])
                 ->select('id', 'name', 'code', 'class_grade_id', 'subject_id')
                 ->get()
                 ->map(function ($group) {
+                    $level = $group->classGrade->level ?? null;
                     return [
                         'id' => $group->id,
                         'name' => $group->name,
                         'code' => $group->code,
                         'class_grade' => $group->classGrade ? [
                             'id' => $group->classGrade->id,
-                            'grade_level' => $group->classGrade->grade_level,
-                            'stage' => $group->classGrade->stage,
+                            'level_number' => $level->level_number ?? null,
+                            'stage' => $level->stage ?? null,
                         ] : null,
                         'subject' => $group->subject ? [
                             'id' => $group->subject->id,

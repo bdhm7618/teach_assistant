@@ -316,7 +316,6 @@ class GenerateApiDocs extends Command
                     'Group' => 'Groups',
                     'Subject' => 'Subjects',
                     'ClassGrade' => 'Class Grades',
-                    'AcademicYear' => 'Academic Years',
                     'Student' => 'Students',
                     'GroupMetadata' => 'Groups Metadata',
                     'StudentMetadata' => 'Students Metadata',
@@ -357,7 +356,6 @@ class GenerateApiDocs extends Command
                 'Groups' => 'Groups',
                 'Subjects' => 'Subjects',
                 'Class Grades' => 'Class Grades',
-                'Academic Years' => 'Academic Years',
                 'Students' => 'Students',
                 'Groups Metadata' => 'Groups Metadata',
                 'Students Metadata' => 'Students Metadata',
@@ -802,7 +800,6 @@ class GenerateApiDocs extends Command
             'end_year' => 2025,
             'grade_level' => 1,
             'stage' => 'primary',
-            'academic_year_id' => 1,
             'class_grade_id' => 1,
         ];
         

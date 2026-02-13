@@ -14,10 +14,16 @@ class GroupResource extends JsonResource
             'code' => $this->code,
             'class_grade_id' => $this->class_grade_id,
             'class_grade' => $this->whenLoaded('classGrade', function () {
+                if ($this->classGrade && $this->classGrade->relationLoaded('level')) {
+                    $level = $this->classGrade->level;
+                    return [
+                        'id' => $this->classGrade->id,
+                        'level_number' => $level->level_number ?? null,
+                        'stage' => $level->stage ?? null,
+                    ];
+                }
                 return [
                     'id' => $this->classGrade->id,
-                    'grade_level' => $this->classGrade->grade_level,
-                    'stage' => $this->classGrade->stage,
                 ];
             }),
             'subject_id' => $this->subject_id,

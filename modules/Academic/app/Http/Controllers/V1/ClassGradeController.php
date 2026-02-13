@@ -45,10 +45,7 @@ class ClassGradeController extends BaseController
             DB::rollBack();
             if ($e->getCode() == 23000 && str_contains($e->getMessage(), 'Duplicate entry')) {
                 return errorResponse(
-                    trans('academic::app.validation.class_grade_duplicate', [
-                        'grade_level' => $request->input('grade_level'),
-                        'stage' => $request->input('stage')
-                    ]),
+                    trans('academic::app.validation.class_grade_level_duplicate'),
                     null,
                     422
                 );
@@ -82,13 +79,9 @@ class ClassGradeController extends BaseController
             );
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            // Handle duplicate entry error
             if ($e->getCode() == 23000 && str_contains($e->getMessage(), 'Duplicate entry')) {
                 return errorResponse(
-                    trans('academic::app.validation.class_grade_duplicate', [
-                        'grade_level' => $request->input('grade_level'),
-                        'stage' => $request->input('stage')
-                    ]),
+                    trans('academic::app.validation.class_grade_level_duplicate'),
                     null,
                     422
                 );

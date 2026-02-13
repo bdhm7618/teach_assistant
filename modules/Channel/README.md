@@ -26,17 +26,17 @@ The Channel module provides a complete solution for multi-tenant validation in L
 **Before using this system**, you had to write code like this in every Request:
 
 ```php
-'academic_year_id' => [
+'subject_id' => [
     'required',
-    'exists:academic_years,id',
+    'exists:subjects,id',
     function ($attribute, $value, $fail) {
-        $academicYear = AcademicYear::withoutChannelScope()
+        $subject = Subject::withoutChannelScope()
             ->where('id', $value)
             ->where('channel_id', auth('user')->user()->channel_id)
             ->first();
         
-        if (!$academicYear) {
-            $fail('The academic year does not belong to the current channel.');
+        if (!$subject) {
+            $fail('The subject does not belong to the current channel.');
         }
     },
 ],
@@ -45,9 +45,9 @@ The Channel module provides a complete solution for multi-tenant validation in L
 **After using this system:**
 
 ```php
-'academic_year_id' => [
+'subject_id' => [
     'required',
-    $this->belongsToChannel(AcademicYear::class),
+    $this->belongsToChannel(Subject::class),
 ],
 ```
 
@@ -271,7 +271,6 @@ public function withValidator($validator)
 
 namespace Modules\Academic\App\Http\Requests\V1;
 
-use Modules\Academic\App\Models\AcademicYear;
 use Modules\Academic\App\Models\ClassGrade;
 use Modules\Channel\App\Http\Requests\V1\BaseRequest;
 
@@ -287,10 +286,6 @@ class ClassGradeRequest extends BaseRequest
         return [
             'grade_level' => 'required|integer|min:1|max:12',
             'stage' => 'required|in:primary,preparatory,secondary',
-            'academic_year_id' => [
-                'required',
-                $this->belongsToChannel(AcademicYear::class),
-            ],
             'is_active' => 'sometimes|boolean'
         ];
     }
@@ -604,7 +599,7 @@ If a model uses the `HasChannelScope` trait, the system will automatically use `
 ```php
 use Modules\Channel\App\Traits\HasChannelScope;
 
-class AcademicYear extends Model
+class Subject extends Model
 {
     use HasChannelScope;
     // ...

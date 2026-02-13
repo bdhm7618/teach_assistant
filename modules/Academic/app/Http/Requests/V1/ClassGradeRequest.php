@@ -2,8 +2,8 @@
 
 namespace Modules\Academic\App\Http\Requests\V1;
 
-use Modules\Academic\App\Models\AcademicYear;
 use Modules\Academic\App\Models\ClassGrade;
+use Modules\Academic\App\Models\Level;
 use Modules\Channel\App\Http\Requests\V1\BaseRequest;
 
 class ClassGradeRequest extends BaseRequest
@@ -16,12 +16,19 @@ class ClassGradeRequest extends BaseRequest
     public function rules()
     {
         return [
-            'grade_level' => 'required|integer|min:1|max:12',
-            'stage' => 'required|in:primary,preparatory,secondary',
-            'academic_year_id' => [
+            'level_id' => [
                 'required',
-                $this->belongsToChannel(AcademicYear::class),
+                'integer',
+                'exists:levels,id',
+                function ($attribute, $value, $fail) {
+                    $channelId = $this->getChannelId();
+                    $level = Level::availableForChannel($channelId)->find($value);
+                    if (!$level) {
+                        $fail(trans('academic::app.validation.level_not_available'));
+                    }
+                },
             ],
+            'name' => 'nullable|string|max:255',
             'is_active' => 'sometimes|boolean'
         ];
     }
@@ -29,8 +36,7 @@ class ClassGradeRequest extends BaseRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $gradeLevel = $this->input('grade_level');
-            $stage = $this->input('stage');
+            $levelId = $this->input('level_id');
             $classGradeId = $this->route('class_grade') ?? $this->route('id') ?? null;
 
             // In update case, verify that the record belongs to the current channel
@@ -52,22 +58,18 @@ class ClassGradeRequest extends BaseRequest
                 }
             }
 
-            // Validate uniqueness (works for both create and update)
-            if ($gradeLevel && $stage) {
+            // Validate uniqueness: one class grade per level per channel
+            if ($levelId) {
                 $uniqueRule = $this->uniqueInChannel(
                     ClassGrade::class,
-                    ['grade_level', 'stage'],
+                    ['level_id'],
                     $classGradeId
                 );
 
-                // Validate uniqueness
-                $uniqueRule->validate('grade_level', $gradeLevel, function ($message) use ($validator, $gradeLevel, $stage) {
+                $uniqueRule->validate('level_id', $levelId, function ($message) use ($validator) {
                     $validator->errors()->add(
-                        'grade_level',
-                        trans('academic::app.validation.class_grade_duplicate', [
-                            'grade_level' => $gradeLevel,
-                            'stage' => $stage
-                        ])
+                        'level_id',
+                        trans('academic::app.validation.class_grade_level_duplicate')
                     );
                 });
             }
