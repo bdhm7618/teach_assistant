@@ -10,11 +10,11 @@ return [
     | Module Namespace
     |--------------------------------------------------------------------------
     |
-    | Default module namespace for project.
+    | Default module namespace.
     |
     */
     'namespace' => 'Modules',
-        
+
     /*
     |--------------------------------------------------------------------------
     | Module Stubs
