@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Core\Providers;
+namespace Modules\Core\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
@@ -152,3 +152,4 @@ class CoreServiceProvider extends ServiceProvider
         return $paths;
     }
 }
+

@@ -13,7 +13,7 @@ class ChannelScope implements Scope
      * (e.g., Admin models that are not tenant-specific, Channel model itself, User model to avoid infinite loop)
      */
     protected $excludedModels = [
-        \Modules\Admin\Models\Admin::class,
+        \Modules\Admin\App\Models\Admin::class,
         \Modules\Channel\App\Models\Channel::class,
         \Modules\Channel\App\Models\User::class,
     ];
@@ -83,4 +83,5 @@ class ChannelScope implements Scope
         return null;
     }
 }
+
 

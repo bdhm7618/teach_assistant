@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Core\Http\Controllers;
+namespace Modules\Core\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -54,3 +54,4 @@ class CoreController extends Controller
      */
     public function destroy($id) {}
 }
+

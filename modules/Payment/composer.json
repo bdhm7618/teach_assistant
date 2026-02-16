@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Payment\\": "app/",
+            "Modules\\Payment\\App\\": "app/",
             "Modules\\Payment\\Database\\Factories\\": "database/factories/",
             "Modules\\Payment\\Database\\Seeders\\": "database/seeders/"
         }
@@ -28,3 +28,4 @@
         }
     }
 }
+

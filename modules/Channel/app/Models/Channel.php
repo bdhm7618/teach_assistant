@@ -2,7 +2,7 @@
 
 namespace Modules\Channel\App\Models;
 
-use Modules\Admin\Models\Admin;
+use Modules\Admin\App\Models\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -27,3 +27,4 @@ class Channel extends Model
         return $this->belongsToMany(User::class);
     }
 }
+

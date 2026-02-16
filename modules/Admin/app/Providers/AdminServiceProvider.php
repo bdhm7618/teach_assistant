@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Admin\Providers;
+namespace Modules\Admin\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
@@ -152,3 +152,4 @@ class AdminServiceProvider extends ServiceProvider
         return $paths;
     }
 }
+

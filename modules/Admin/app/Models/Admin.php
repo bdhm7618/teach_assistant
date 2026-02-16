@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Admin\Models;
+namespace Modules\Admin\App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,3 +35,4 @@ class Admin extends Authenticatable implements JWTSubject
             return [];
         }
 }
+

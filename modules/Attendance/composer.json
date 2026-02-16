@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Attendance\\": "app/",
+            "Modules\\Attendance\\App\\": "app/",
             "Modules\\Attendance\\Database\\Factories\\": "database/factories/",
             "Modules\\Attendance\\Database\\Seeders\\": "database/seeders/"
         }
@@ -28,3 +28,4 @@
         }
     }
 }
+
