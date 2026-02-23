@@ -12,6 +12,7 @@ use Modules\Channel\App\Events\UserRegistered;
 use Modules\Channel\App\Http\Resources\UserResource;
 use Modules\Channel\App\Repositories\UserRepository;
 use Modules\Channel\App\Repositories\ChannelRepository;
+use Modules\Channel\App\Models\Role;
 use Modules\Channel\App\Http\Requests\V1\RegisterRequest;
 
 /**
@@ -63,16 +64,38 @@ class ChannelController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-    public  function register(RegisterRequest $request)
+    public function register(RegisterRequest $request)
     {
         $data = $request->validated();
-        $channel = $this->channelRepository->create(["name" => $data['channel_name']]);
-        $data["channel_id"] = $channel->id;
-        $user = $this->userRepository->create($data);
-        DB::commit();
-        event(new UserRegistered($user));
 
-        return successResponse(new UserResource($user), trans("channel::app.channel.created"), 201);
+        DB::beginTransaction();
+
+        try {
+            // Create the channel
+            $channel = $this->channelRepository->create(["name" => $data['channel_name']]);
+
+            // Assign channel_id
+            $data["channel_id"] = $channel->id;
+
+            // Assign 'owner' role_id
+            $ownerRole = Role::where('name', 'owner')->first();
+            if ($ownerRole) {
+                $data["role_id"] = $ownerRole->id;
+            }
+
+            // Create the user
+            $user = $this->userRepository->create($data);
+
+            DB::commit();
+
+            // Fire registration event
+            event(new UserRegistered($user));
+
+            return successResponse(new UserResource($user), trans("channel::app.channel.created"), 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return errorResponse(trans("channel::app.common.operation_failed"), $e->getMessage());
+        }
     }
 
 
