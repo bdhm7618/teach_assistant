@@ -15,9 +15,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Academic\\App\\": "app/",
-            "Modules\\Academic\\Database\\Factories\\": "database/factories/",
-            "Modules\\Academic\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Academic\\App\\": "App/",
+            "Modules\\Academic\\Database\\Factories\\": "Database/Factories/",
+            "Modules\\Academic\\Database\\Seeders\\": "Database/Seeders/"
         }
     },
     "autoload-dev": {
