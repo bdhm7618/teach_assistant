@@ -27,7 +27,7 @@ class ChannelServiceProvider extends ServiceProvider
         $this->registerCommandSchedules();
         $this->registerTranslations();
         $this->registerConfig();
-        $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->name, 'Database/Migrations'));
         $this->registerRoutes();
         $this->registerViews();
     }
@@ -139,7 +139,7 @@ class ChannelServiceProvider extends ServiceProvider
 
     protected function registerRoutes(): void
     {
-        $routesPath = module_path($this->name, 'routes');
+        $routesPath = module_path($this->name, 'Routes');
 
         if (is_dir($routesPath)) {
 

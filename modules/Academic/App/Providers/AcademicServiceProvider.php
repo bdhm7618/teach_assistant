@@ -14,7 +14,7 @@ class AcademicServiceProvider extends ServiceProvider
     {
         // Register module config
         $this->mergeConfigFrom(
-            __DIR__ . '/../../config/academic.php',
+            __DIR__ . '/../../Config/academic.php',
             'academic'
         );
     }
@@ -32,21 +32,21 @@ class AcademicServiceProvider extends ServiceProvider
 
     protected function registerMigrations(): void
     {
-        $this->loadMigrationsFrom(module_path('Academic', 'database/migrations'));
+        $this->loadMigrationsFrom(module_path('Academic', 'Database/Migrations'));
     }
 
     protected function registerRoutes(): void
     {
-        $this->loadRoutesFrom(module_path('Academic', 'routes/api-v1.php'));
+        $this->loadRoutesFrom(module_path('Academic', 'Routes/api-v1.php'));
     }
 
     protected function registerViews(): void
     {
-        $this->loadViewsFrom(module_path('Academic', 'resources/views'), 'academic');
+        $this->loadViewsFrom(module_path('Academic', 'Resources/Views'), 'academic');
     }
 
     protected function registerTranslations(): void
     {
-        $this->loadTranslationsFrom(module_path('Academic', 'resources/lang'), 'academic');
+        $this->loadTranslationsFrom(module_path('Academic', 'Resources/Lang'), 'academic');
     }
 }
