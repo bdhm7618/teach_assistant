@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://teachify.127.0.0.1.io",
+            "url": "https://abdo.muhammedsidky.com",
             "description": "API Server"
         }
     ],
