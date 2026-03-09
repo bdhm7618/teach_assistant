@@ -56,7 +56,7 @@ class ChannelServiceProvider extends ServiceProvider
     protected function registerTranslations(): void
     {
 
-        $moduleLangPath = module_path($this->name, 'Resources/lang'); // Module lang folder
+        $moduleLangPath = module_path($this->name, 'Resources/Lang'); // Module lang folder
         $overrideLangPath = resource_path('lang/modules/' . $this->nameLower); // Optional override path
 
         // Load override translations first (if exist)
@@ -73,7 +73,7 @@ class ChannelServiceProvider extends ServiceProvider
     {
         $viewPath = resource_path('views/modules/channel');
 
-        $sourcePath = module_path('Channel', 'Resources/views');
+        $sourcePath = module_path('Channel', 'Resources/Views');
 
         if (is_dir($viewPath)) {
             $this->loadViewsFrom($viewPath, 'channel');
