@@ -15,14 +15,10 @@ class SendEmailVerificationListener
 
     public function handle(UserRegistered $event): void
     {
-        $otp = $this->otpRepository->generate(
-            $event->user,
-            24 * 60
-        );
+        $this->otpRepository->invalidatePrevious($event->user, 'email_verification');
 
-        SendEmailVerificationJob::dispatch(
-            $event->user,
-            $otp->code
-        );
+        $otp = $this->otpRepository->generate($event->user, 'email_verification', 24 * 60);
+
+        SendEmailVerificationJob::dispatch($event->user, $otp->code);
     }
 }

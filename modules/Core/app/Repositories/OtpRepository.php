@@ -16,10 +16,12 @@ class OtpRepository extends BaseRepository
 
     public function generate(
         Model $otpable,
-        $expiresInMinutes = 60
+        string $type = 'email_verification',
+        int $expiresInMinutes = 60
     ): Otp {
         return $otpable->otps()->create([
-            'code' => random_int(1, 999999),
+            'type'       => $type,
+            'code'       => str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT),
             'expires_at' => now()->addMinutes($expiresInMinutes),
         ]);
     }

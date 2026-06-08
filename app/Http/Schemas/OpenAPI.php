@@ -38,4 +38,4 @@ namespace App\Http\Schemas;
  *     @OA\Property(property="errors", type="object", nullable=true)
  * )
  */
-
+class OpenAPI {}

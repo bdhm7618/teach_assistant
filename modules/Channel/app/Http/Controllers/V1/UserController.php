@@ -4,11 +4,15 @@ namespace Modules\Channel\App\Http\Controllers\V1;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Modules\Channel\App\Http\Controllers\V1\BaseController;
 use Modules\Channel\App\Repositories\UserRepository;
 use Modules\Channel\App\Http\Requests\V1\UserRequest;
 use Modules\Channel\App\Http\Resources\UserResource;
 use Prettus\Repository\Eloquent\BaseRepository;
 
+/**
+ * @OA\Tag(name="Users", description="Channel staff user management")
+ */
 class UserController extends BaseController
 {
     protected UserRepository $repository;

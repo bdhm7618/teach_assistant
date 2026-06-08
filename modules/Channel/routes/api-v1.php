@@ -5,23 +5,27 @@ use Modules\Channel\App\Http\Controllers\V1\ChannelController;
 use Modules\Channel\App\Http\Controllers\V1\UserController;
 use Modules\Channel\App\Http\Controllers\V1\RoleController;
 
-// Public routes (no authentication required)
-Route::prefix('api/v1/channel/')
-    ->group(function () {
-        Route::post('register', [ChannelController::class, 'register']);
-        Route::post("user/verify-email", [ChannelController::class, "validateOtp"]);
-        Route::post("user/login", [ChannelController::class, "login"]);
-        Route::post('user/forget-password', [ChannelController::class, 'forgetPassword']);
-        Route::post('user/reset-password', [ChannelController::class, 'resetPassword']);
-    });
+// ─── Public routes (no authentication, no slug) ──────────────────────────────
+Route::prefix('api/v1/auth')->group(function () {
+    Route::post('register',         [ChannelController::class, 'register']);
+    Route::post('verify-email',     [ChannelController::class, 'validateOtp']);
+    Route::post('resend-otp',       [ChannelController::class, 'resendOtp']);
+    Route::post('login',            [ChannelController::class, 'login']);
+    Route::post('forget-password',  [ChannelController::class, 'forgetPassword']);
+    Route::post('reset-password',   [ChannelController::class, 'resetPassword']);
+});
 
-// Protected routes (authentication required)
-Route::prefix('api/v1/')
-    ->middleware('auth:user')
+// ─── Protected routes (slug-scoped + JWT) ────────────────────────────────────
+Route::prefix('api/v1/{channel_slug}')
+    ->middleware(['identify.tenant', 'auth:user'])
     ->group(function () {
-        // Users management (channel-scoped)
+        Route::get('auth/me',      [ChannelController::class, 'me']);
+        Route::post('auth/logout', [ChannelController::class, 'logout']);
+        Route::post('auth/refresh',[ChannelController::class, 'refreshToken']);
+
+        Route::get('channel',   [ChannelController::class, 'show']);
+        Route::patch('channel', [ChannelController::class, 'show']); // placeholder until update is wired
+
         Route::apiResource('users', UserController::class);
-
-        // Roles management
         Route::apiResource('roles', RoleController::class);
     });

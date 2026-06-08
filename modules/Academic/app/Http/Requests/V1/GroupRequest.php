@@ -22,11 +22,15 @@ class GroupRequest extends BaseRequest
         $groupId = $this->route('group') ?? $this->route('id') ?? null;
 
         return [
-            'name' => 'required|string|max:255',
+            'name'          => 'required|string|max:255',
+            'course_id'     => ['nullable', 'integer', 'exists:courses,id'],
             'class_grade_id' => [
-                'required',
+                'nullable',
                 $this->belongsToChannel(ClassGrade::class),
             ],
+            'payment_model' => 'sometimes|in:per_course,monthly,per_session',
+            'starts_at'     => 'nullable|date',
+            'ends_at'       => 'nullable|date|after_or_equal:starts_at',
             'subject_id' => [
                 'required',
                 'integer',

@@ -16,8 +16,12 @@ trait HasChannelScope
         static::addGlobalScope(new ChannelScope());
 
         static::creating(function ($model) {
-            if (empty($model->channel_id) && auth("user")->check()) {
-                $model->channel_id = auth("user")->user()?->channel_id;
+            if (empty($model->channel_id)) {
+                if (app()->has('current_channel_id')) {
+                    $model->channel_id = app('current_channel_id');
+                } elseif (auth('user')->check()) {
+                    $model->channel_id = auth('user')->user()?->channel_id;
+                }
             }
         });
     }

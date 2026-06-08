@@ -2,10 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Student\App\Http\Controllers\V1\StudentController;
+use Modules\Student\App\Http\Controllers\V1\StudentMetadataController;
 
-Route::prefix('students/')->middleware("auth:user")
+// RouteServiceProvider already adds: api/v1
+// This file adds:                   {channel_slug}
+// Full URL:                         /api/v1/{channel_slug}/students/...
+
+Route::prefix('{channel_slug}')
+    ->middleware(['identify.tenant', 'auth:user'])
     ->group(function () {
-        Route::apiResource('', StudentController::class)->parameters(['' => 'student']);
-        Route::get("metadata", [\Modules\Student\App\Http\Controllers\V1\StudentMetadataController::class, 'index']);
+        Route::apiResource('students', StudentController::class);
+        Route::get('students/metadata', [StudentMetadataController::class, 'index']);
     });
-

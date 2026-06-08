@@ -4,11 +4,15 @@ namespace Modules\Channel\App\Http\Controllers\V1;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Modules\Channel\App\Http\Controllers\V1\BaseController;
 use Modules\Channel\App\Repositories\RoleRepository;
 use Modules\Channel\App\Http\Requests\V1\RoleRequest;
 use Modules\Channel\App\Http\Resources\RoleResource;
 use Prettus\Repository\Eloquent\BaseRepository;
 
+/**
+ * @OA\Tag(name="Roles", description="Channel role management — all routes are slug-scoped: /api/v1/{channel_slug}/roles")
+ */
 class RoleController extends BaseController
 {
     protected RoleRepository $repository;

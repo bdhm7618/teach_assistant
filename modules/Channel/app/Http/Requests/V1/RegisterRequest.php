@@ -10,11 +10,12 @@ class RegisterRequest extends FormRequest
     {
         return [
             'channel_name' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:20|unique:users,phone',
-            'gender' => 'required|in:male,female',
-            'password' => 'required|string|min:6|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/',
+            'channel_type' => 'required|in:teacher,center',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|unique:users,email',
+            'phone'        => ['required', 'string', 'unique:users,phone', 'regex:/^01[0125][0-9]{8}$/'],
+            'gender'       => 'required|in:male,female',
+            'password'     => 'required|string|min:6|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/',
         ];
     }
 }
