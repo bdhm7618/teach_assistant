@@ -121,3 +121,107 @@
 ### Swagger
 - ChannelController updated with @OA\\ annotations for all new endpoints (resendOtp, logout, refreshToken)
 - `php artisan l5-swagger:generate` — SUCCESS
+
+---
+
+## Phase 2 — RBAC Completion — 2026-06-09
+
+### Created
+- `modules/Core/App/Http/Middleware/CheckPermission.php` — validates `user->hasAllPermissions()`; owner (permissions="all") always passes; comma-separated multi-permission support
+
+### Modified
+- `bootstrap/app.php` — registered `check.permission` middleware alias
+- `modules/Channel/App/Http/Controllers/V1/ChannelController.php` — register() now looks up owner system role and assigns it to the new user via `role_id`
+- `modules/Channel/Database/Seeders/RoleSeeder.php` — rationalized permission catalog: `courses.view`, `groups.view`, `sessions.*`, `students.*`, `attendance.*`, `payments.*`, `reports.view`, `users.*`, `roles.*`
+- `modules/Channel/routes/api-v1.php` — expanded `apiResource` into explicit routes with per-action `check.permission` middleware for `users` and `roles`
+- `modules/Channel/App/Http/Controllers/V1/UserController.php` — added full @OA\\ Swagger annotations for all 5 endpoints
+- `modules/Channel/App/Http/Controllers/V1/RoleController.php` — added full @OA\\ Swagger annotations for all 5 endpoints
+
+### Seeder run
+- `RoleSeeder` — updated permissions for teacher, assistant, viewer system roles ✅
+
+### Permission catalog
+| Permission | owner | teacher | assistant | viewer |
+|---|---|---|---|---|
+| `users.*` / `roles.*` | ✅ | ❌ | ❌ | ❌ |
+| `courses.view` | ✅ | ✅ | ✅ | ✅ |
+| `groups.view` | ✅ | ✅ | ✅ | ✅ |
+| `sessions.view` | ✅ | ✅ | ✅ | ✅ |
+| `sessions.create/update` | ✅ | ✅ | ❌ | ❌ |
+| `students.view` | ✅ | ✅ | ✅ | ✅ |
+| `students.create` | ✅ | ✅ | ✅ | ❌ |
+| `attendance.view` | ✅ | ✅ | ✅ | ✅ |
+| `attendance.manage` | ✅ | ✅ | ✅ | ❌ |
+| `reports.view` | ✅ | ✅ | ❌ | ✅ |
+
+### Swagger
+- UserController and RoleController now have full @OA\\ annotations
+- `php artisan l5-swagger:generate` — SUCCESS
+
+---
+
+## Phase 3 — Subject Management — 2026-06-09
+
+### Modified
+- `modules/Academic/App/Http/Controllers/V1/SubjectController.php` — added full @OA\\ annotations for all 5 endpoints; refactored `createTranslations/updateTranslations` into single `saveTranslations($upsert)` helper
+- `modules/Academic/routes/api-v1.php` — replaced `Route::apiResource('subjects', ...)` with explicit per-action routes gated by `check.permission:subjects.view/create/update/delete`
+
+### No migrations needed
+- subjects + subject_translations tables already existed and are in correct shape
+
+### Swagger
+- SubjectController now has full @OA\\ annotations (5 endpoints) with filter params documented
+- `php artisan l5-swagger:generate` — SUCCESS
+
+---
+
+## Phase 5 — Parent / Guardian — 2026-06-09
+
+### Created
+- `modules/Student/Database/Migrations/2026_06_09_000001_create_guardians_table.php` — guardians table with student_id FK, relationship enum, is_primary flag
+- `modules/Student/App/Models/Guardian.php` — HasChannelScope, belongsTo Student
+- `modules/Student/App/Http/Controllers/V1/GuardianController.php` — full CRUD nested under students/{student}/guardians; is_primary enforcement (clears other primary on set)
+- `modules/Student/App/Http/Requests/V1/GuardianRequest.php`
+- `modules/Student/App/Http/Resources/V1/GuardianResource.php`
+
+### Modified
+- `modules/Student/App/Models/Student.php` — added guardians() and primaryGuardian() relationships
+- `modules/Student/App/Http/Controllers/V1/StudentController.php` — removed invalid withCount(['attendances','payments']); fixed duplicate-count; added full @OA\\ Swagger annotations for all 5 endpoints; loads guardians in show()
+- `modules/Student/App/Http/Resources/V1/StudentResource.php` — added guardians and primary_guardian whenLoaded; removed stale attendances_count/payments_count
+- `modules/Student/routes/api-v1.php` — moved metadata route BEFORE resource routes (prevents 'metadata' matching {id}); replaced apiResource with explicit permission-gated routes; added guardian nested routes
+- `modules/Student/resources/lang/en/app.php` — added guardian.* keys
+- `modules/Student/resources/lang/ar/app.php` — same in Arabic
+
+### Migrations run
+- `2026_06_09_000001_create_guardians_table` ✅
+
+### Swagger
+- StudentController + GuardianController fully annotated
+- `php artisan l5-swagger:generate` — SUCCESS
+
+---
+
+## Schema Audit + Fixes — 2026-06-10
+
+### Issues identified and resolved
+
+| # | Table | Issue | Fix |
+|---|-------|-------|-----|
+| 1 | `admins` | `geneder` column typo | Renamed to `gender` |
+| 2 | `students` | `code`, `email`, `phone` had global UNIQUE — breaks multi-tenancy | Dropped global uniques; added composite UNIQUE per channel |
+| 3 | `group_students` | No `channel_id`, no UNIQUE constraint → duplicate enrollments possible | Added `channel_id` FK + `UNIQUE(group_id, student_id)` |
+| 4 | `student_enrollments` | `enrollment_type` values (`course`, `session_package`) didn't match `groups.payment_model` (`per_course`, `per_session`) | Migrated data + altered enum to `monthly`, `per_course`, `per_session` |
+
+### Created
+- `modules/Admin/database/migrations/2026_06_10_000001_fix_admins_geneder_typo.php`
+- `modules/Student/database/migrations/2026_06_10_000002_fix_students_unique_constraints.php`
+- `modules/Student/database/migrations/2026_06_10_000003_fix_group_students_add_channel_and_unique.php`
+- `modules/Academic/database/migrations/2026_06_10_000004_fix_student_enrollments_enum.php`
+
+### Migrations run
+- All 4 fix migrations ✅
+
+### No renames needed
+- `group_sessions` name is intentional (avoids conflict with Laravel's `sessions` table)
+- `session_times` name is accurate and descriptive enough
+- All other table names match the BRD plan

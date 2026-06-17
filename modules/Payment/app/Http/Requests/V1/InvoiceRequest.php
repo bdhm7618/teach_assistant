@@ -29,11 +29,14 @@ class InvoiceRequest extends BaseRequest
                 'integer',
                 $this->belongsToChannel(Group::class),
             ],
-            'total_amount' => 'required|numeric|min:0.01',
+            'enrollment_id'   => 'nullable|integer|exists:student_enrollments,id',
+            'total_amount'    => 'required|numeric|min:0.01',
             'discount_amount' => 'nullable|numeric|min:0|max:' . ($this->input('total_amount') ?? 0),
-            'due_date' => 'required|date|after_or_equal:today',
-            'issue_date' => 'nullable|date',
-            'notes' => 'nullable|string|max:1000',
+            'due_date'        => 'required|date|after_or_equal:today',
+            'issue_date'      => 'nullable|date',
+            'type'            => 'nullable|in:monthly,session,enrollment_fee,ad_hoc',
+            'reason'          => 'required_if:type,ad_hoc|nullable|string|max:500',
+            'notes'           => 'nullable|string|max:1000',
         ];
     }
 

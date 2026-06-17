@@ -1,6 +1,6 @@
 # Channel Project — Implementation Progress
 
-Last updated: 2026-06-08
+Last updated: 2026-06-17
 
 ## Phase 0 — Architecture Fixes
 
@@ -15,12 +15,12 @@ Last updated: 2026-06-08
 | Phase | Name | Status | Depends On |
 |-------|------|--------|------------|
 | P1 | Complete Auth (OTP, email verify) | ✅ Done | 2026-06-08 |
-| P2 | RBAC Completion | ⬜ Pending | P0 |
-| P3 | Subject Management | ⬜ Pending | P0 |
+| P2 | RBAC Completion | ✅ Done | 2026-06-09 |
+| P3 | Subject Management | ✅ Done | 2026-06-09 |
 | P4 | Course + Group CRUD | ✅ Done (P0-B) | — |
-| P5 | Parent / Guardian | ⬜ Pending | P1 |
+| P5 | Parent / Guardian | ✅ Done | 2026-06-09 |
 | P6 | Sessions (dated instances) | ✅ Done (P0-C) | — |
-| P7 | Enrollment + Payment Dues | ⬜ Pending | P0 |
+| P7 | Enrollment + Payment Dues | ✅ Done | 2026-06-17 |
 | P8 | Attendance QR + Realtime | ⬜ Pending | P0 |
 | P9 | Exam Module | ⬜ Pending | P0 |
 | P10 | Assignment Module | ⬜ Pending | P9 |

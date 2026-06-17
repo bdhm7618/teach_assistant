@@ -790,6 +790,747 @@
                 ]
             }
         },
+        "/api/v1/{channel_slug}/student-enrollments": {
+            "get": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "List enrollments",
+                "operationId": "63e7d54336f08d7eb06b2437642ea897",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "student_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "group_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "paused",
+                                "canceled",
+                                "completed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enrollment list"
+                    },
+                    "403": {
+                        "description": "Requires students.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Enroll a student into a group",
+                "operationId": "2984c898be12e8dc456f0d383f04a7be",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "student_id",
+                                    "group_id",
+                                    "enrollment_type",
+                                    "start_date"
+                                ],
+                                "properties": {
+                                    "student_id": {
+                                        "type": "integer"
+                                    },
+                                    "group_id": {
+                                        "type": "integer"
+                                    },
+                                    "enrollment_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "monthly",
+                                            "per_course",
+                                            "per_session"
+                                        ]
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "agreed_monthly_fee": {
+                                        "description": "Required for monthly type",
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "agreed_course_fee": {
+                                        "description": "Required for per_course type",
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "agreed_session_fee": {
+                                        "description": "Required for per_session type",
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "sessions_per_month": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Enrolled — first-month invoice auto-created (prorated if mid-month)"
+                    },
+                    "403": {
+                        "description": "Requires students.create"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/student-enrollments/{id}": {
+            "get": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Get a single enrollment",
+                "operationId": "4bf982bc8b8c6306b654b466ba07d7b2",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enrollment data"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Update an enrollment",
+                "operationId": "5f5f6542f7a5b54b9f1e49fb051ba279",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "paused",
+                                            "canceled",
+                                            "completed"
+                                        ]
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "agreed_monthly_fee": {
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "sessions_per_month": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Requires students.update"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Cancel / remove an enrollment",
+                "operationId": "da61a97831c1e72dfe820a8e17284112",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Requires students.delete"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/students/{studentId}/enrollments": {
+            "get": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "List all enrollments for a student",
+                "operationId": "2128291c1f96d0fe2bf56dee90d6cc50",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "studentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enrollment list"
+                    },
+                    "403": {
+                        "description": "Requires students.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/groups/{groupId}/enrollments": {
+            "get": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "List all enrollments for a group",
+                "operationId": "355a8a0754a203b24d83553f380c9dba",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enrollment list"
+                    },
+                    "403": {
+                        "description": "Requires students.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/subjects": {
+            "get": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "List subjects visible to this channel (channel-specific + general)",
+                "operationId": "5ad64f3f885644af9c51fc16b648fc8a",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "Filter by active status",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "is_general",
+                        "in": "query",
+                        "description": "true = general subjects only, false = channel-specific only",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated subject list with locale-aware names"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires subjects.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Create a channel-specific subject with bilingual translations",
+                "operationId": "a7ae6739cc738d6335bc0eb71527afd9",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code",
+                                    "credits",
+                                    "translations"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "MATH101"
+                                    },
+                                    "credits": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "translations": {
+                                        "properties": {
+                                            "en": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Mathematics"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "ar": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "الرياضيات"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Subject created"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires subjects.create"
+                    },
+                    "422": {
+                        "description": "Validation error or duplicate code"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/subjects/{id}": {
+            "get": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Get a subject with all translations",
+                "operationId": "36bb9cc270987b23261fdd1ca5993e96",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subject data"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires subjects.view"
+                    },
+                    "404": {
+                        "description": "Subject not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Update a channel-specific subject",
+                "operationId": "9bad5334cb57c4b4a0761d6adc71d1b1",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "credits": {
+                                        "type": "integer"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    },
+                                    "translations": {
+                                        "properties": {
+                                            "en": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "ar": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Subject updated"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires subjects.update"
+                    },
+                    "404": {
+                        "description": "Subject not found or belongs to another channel"
+                    },
+                    "422": {
+                        "description": "Validation error or duplicate code"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Delete a channel-specific subject",
+                "operationId": "5dd3b10209229b240d861f8acfaf890a",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subject deleted"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires subjects.delete"
+                    },
+                    "404": {
+                        "description": "Subject not found or belongs to another channel"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/{resource}": {
             "get": {
                 "tags": [
@@ -1366,6 +2107,2056 @@
                     }
                 ]
             }
+        },
+        "/api/v1/{channel_slug}/roles": {
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Create a channel-specific custom role",
+                "operationId": "8f52137e4484a657e8f2371e8a7e1744",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "permissions"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "accountant"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Handles payment records"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "payments.view"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Role created"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires roles.create"
+                    },
+                    "422": {
+                        "description": "Validation error or system role conflict"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/roles/{id}": {
+            "put": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Update a channel-specific role",
+                "operationId": "fa13cf89a752477888fd7bbe61de564d",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Role updated"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires roles.update"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    },
+                    "422": {
+                        "description": "System role cannot be modified"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Delete a channel-specific custom role",
+                "operationId": "55f6aee56f52d3272b0245df2b000c38",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role deleted"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires roles.delete"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    },
+                    "422": {
+                        "description": "System role cannot be deleted, or role is assigned to users"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/users": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new staff user in the channel",
+                "operationId": "ecb56473f4a0b1ad7a7faa8e2d71a98d",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "gender",
+                                    "password",
+                                    "password_confirmation",
+                                    "role_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Ahmed Ali"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ahmed@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "01001234567"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ],
+                                        "example": "male"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires users.create"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/users/{id}": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a channel user",
+                "operationId": "b415303b95124bacc0916d36aae702b7",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role_id": {
+                                        "type": "integer"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires users.update"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a channel user",
+                "operationId": "207f0a8d4957fc84fa82d752022e0c06",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires users.delete, or self-deletion attempt"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/invoices": {
+            "post": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Create an invoice (monthly, ad-hoc, session, or enrollment fee)",
+                "operationId": "ccebed29429025c7080461a4b7a143d5",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "student_id",
+                                    "total_amount",
+                                    "due_date"
+                                ],
+                                "properties": {
+                                    "student_id": {
+                                        "type": "integer"
+                                    },
+                                    "group_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "enrollment_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "total_amount": {
+                                        "type": "number",
+                                        "example": 500
+                                    },
+                                    "discount_amount": {
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "issue_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "monthly",
+                                            "session",
+                                            "enrollment_fee",
+                                            "ad_hoc"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "reason": {
+                                        "description": "Required when type=ad_hoc",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Invoice created"
+                    },
+                    "403": {
+                        "description": "Requires payments.create"
+                    },
+                    "422": {
+                        "description": "Validation error — reason required for ad_hoc type"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/invoices/with-installments": {
+            "post": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Create an invoice and split it into installments",
+                "operationId": "aa39fb5534588e77cd03932d8484d09a",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "student_id",
+                                    "total_amount",
+                                    "due_date",
+                                    "installments"
+                                ],
+                                "properties": {
+                                    "student_id": {
+                                        "type": "integer"
+                                    },
+                                    "total_amount": {
+                                        "type": "number"
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "installments": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "amount": {
+                                                    "type": "number"
+                                                },
+                                                "due_date": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Invoice created with installments"
+                    },
+                    "403": {
+                        "description": "Requires payments.create"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/invoices/{id}": {
+            "put": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Update an invoice",
+                "operationId": "834ec736490f77bf1264d2536122a523",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "total_amount": {
+                                        "type": "number"
+                                    },
+                                    "discount_amount": {
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Requires payments.update"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Delete an invoice",
+                "operationId": "342dd89cc67933d3562b9d0c96be8672",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Requires payments.delete"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/invoices/student/{studentId}": {
+            "get": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "List invoices for a student",
+                "operationId": "d457cd57e81091930bd5f6f2e9abe210",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "studentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Invoice list"
+                    },
+                    "403": {
+                        "description": "Requires payments.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/invoices/overdue": {
+            "get": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "List all overdue invoices (payment dues)",
+                "operationId": "64ed3b7c25ef4eaaaa06e1180d2ca2bb",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Overdue invoice list — sorted by due_date asc"
+                    },
+                    "403": {
+                        "description": "Requires payments.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/invoices/pending": {
+            "get": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "List pending invoices not yet due",
+                "operationId": "f19c26136452eef88a781aa9f4df9bf6",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pending invoice list"
+                    },
+                    "403": {
+                        "description": "Requires payments.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Record a new payment",
+                "operationId": "1d4d16e7a741adc93a122e22509361e7",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "student_id",
+                                    "amount",
+                                    "payment_method"
+                                ],
+                                "properties": {
+                                    "student_id": {
+                                        "type": "integer"
+                                    },
+                                    "group_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "invoice_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "installment_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "payment_period_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "example": 500
+                                    },
+                                    "discount_amount": {
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "payment_date": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "payment_method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cash",
+                                            "bank_transfer",
+                                            "vodafone_cash",
+                                            "orange_money",
+                                            "etisalat_cash",
+                                            "easy_pay",
+                                            "credit_card",
+                                            "debit_card",
+                                            "online",
+                                            "other"
+                                        ]
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "completed",
+                                            "failed",
+                                            "refunded",
+                                            "cancelled"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "reference_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "transaction_id": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Payment recorded"
+                    },
+                    "403": {
+                        "description": "Requires payments.create"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments/{id}": {
+            "put": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Update a payment",
+                "operationId": "f298aab2f9b99238ce42aebe53858f36",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "amount": {
+                                        "type": "number"
+                                    },
+                                    "discount_amount": {
+                                        "type": "number",
+                                        "nullable": true
+                                    },
+                                    "payment_method": {
+                                        "type": "string"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Requires payments.update"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Delete a payment",
+                "operationId": "18e5ad0810eaa825abba8f420e467fe8",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Requires payments.delete"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments/{id}/complete": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Mark a payment as completed",
+                "operationId": "da6453291f81f2661787396b2d2b4693",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "transaction_id": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Marked as completed"
+                    },
+                    "403": {
+                        "description": "Requires payments.update"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments/{id}/refund": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Refund a completed payment",
+                "operationId": "55d56157d6b3e96d37ad12bb36d5250d",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Refunded"
+                    },
+                    "403": {
+                        "description": "Requires payments.update"
+                    },
+                    "422": {
+                        "description": "Cannot refund — business rule violation"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments/student/{studentId}": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List payments for a student",
+                "operationId": "9dcd435d81138c0699ea03314dbb3350",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "studentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment list"
+                    },
+                    "403": {
+                        "description": "Requires payments.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments/group/{groupId}": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List payments for a group",
+                "operationId": "fa6e9b21f36d681151280fb0aa7f2412",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment list"
+                    },
+                    "403": {
+                        "description": "Requires payments.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments/statistics": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Financial statistics for the channel",
+                "operationId": "5807d05836c75635c0ab9fe15595c878",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statistics object"
+                    },
+                    "403": {
+                        "description": "Requires payments.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/payments/student/{studentId}/summary": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Payment summary for a student",
+                "operationId": "850278aeae126551dcfe24c7f56bdc3c",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "studentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Summary object"
+                    },
+                    "403": {
+                        "description": "Requires payments.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/students/{student}/guardians": {
+            "get": {
+                "tags": [
+                    "Guardians"
+                ],
+                "summary": "List guardians for a student",
+                "operationId": "da593a58ea2e154469f9bb64efbff49a",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "student",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Guardian list"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.view"
+                    },
+                    "404": {
+                        "description": "Student not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Guardians"
+                ],
+                "summary": "Add a guardian to a student",
+                "operationId": "2d29bb4a20cfd483b1c51bf76653d292",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "student",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "phone",
+                                    "relationship"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Hassan Ali"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "01009876543"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "relationship": {
+                                        "type": "string",
+                                        "enum": [
+                                            "father",
+                                            "mother",
+                                            "brother",
+                                            "sister",
+                                            "uncle",
+                                            "aunt",
+                                            "other"
+                                        ],
+                                        "example": "father"
+                                    },
+                                    "is_primary": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Guardian added"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.update"
+                    },
+                    "404": {
+                        "description": "Student not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/students/{student}/guardians/{id}": {
+            "get": {
+                "tags": [
+                    "Guardians"
+                ],
+                "summary": "Get a single guardian",
+                "operationId": "59abc8f00f54c5464555a9549380a574",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "student",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Guardian data"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Guardians"
+                ],
+                "summary": "Update a guardian",
+                "operationId": "b1ede9ecadae5d8025ab45b32767f69a",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "student",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "relationship": {
+                                        "type": "string",
+                                        "enum": [
+                                            "father",
+                                            "mother",
+                                            "brother",
+                                            "sister",
+                                            "uncle",
+                                            "aunt",
+                                            "other"
+                                        ]
+                                    },
+                                    "is_primary": {
+                                        "type": "boolean"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Guardian updated"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.update"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Guardians"
+                ],
+                "summary": "Remove a guardian from a student",
+                "operationId": "084e631c3ced3a24159f8f16642b0b30",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "student",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Guardian removed"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.update"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/students": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "List students with optional filters",
+                "operationId": "00da3991952be56c749a4fe7f56477ac",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "group_id",
+                        "in": "query",
+                        "description": "Filter by group",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "gender",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "male",
+                                "female"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name, code, email, or phone",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated student list"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Create a new student",
+                "operationId": "6bcfeae2bd82fd556c8a26e9fac25106",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "gender"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Omar Hassan"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ],
+                                        "example": "male"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "01001234567",
+                                        "nullable": true
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 6,
+                                        "nullable": true
+                                    },
+                                    "code": {
+                                        "description": "Auto-generated if omitted",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "default": 1,
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
+                                    },
+                                    "group_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Student created"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.create"
+                    },
+                    "422": {
+                        "description": "Validation error or duplicate"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/students/{id}": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get a student with groups and guardians",
+                "operationId": "28a69d383ab486e08f15f0d9249ad873",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student data"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.view"
+                    },
+                    "404": {
+                        "description": "Student not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Update a student",
+                "operationId": "67ce37c3cb4ba020aca084f9fec67420",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 6,
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
+                                    },
+                                    "group_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Student updated"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.update"
+                    },
+                    "404": {
+                        "description": "Student not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Delete a student",
+                "operationId": "8c8ca5613f03b54efb79e9e3f954e0ed",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student deleted"
+                    },
+                    "403": {
+                        "description": "Insufficient permissions — requires students.delete"
+                    },
+                    "404": {
+                        "description": "Student not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1427,12 +4218,44 @@
             "description": "Individual session instances — slug-scoped: /api/v1/{channel_slug}/groups/{group}/sessions"
         },
         {
+            "name": "Enrollments",
+            "description": "Student enrollment into groups — nested fees and first-invoice proration"
+        },
+        {
+            "name": "Subjects",
+            "description": "Subject management — channel-specific and general subjects. All routes under /api/v1/{channel_slug}/subjects"
+        },
+        {
             "name": "Auth",
             "description": "Authentication and channel registration"
         },
         {
             "name": "Channel",
             "description": "Channel management (slug-scoped)"
+        },
+        {
+            "name": "Roles",
+            "description": "Channel role management — all routes under /api/v1/{channel_slug}/roles"
+        },
+        {
+            "name": "Users",
+            "description": "Channel staff user management — all routes under /api/v1/{channel_slug}/users"
+        },
+        {
+            "name": "Invoices",
+            "description": "Invoice management — ad-hoc dues, monthly billing, installments"
+        },
+        {
+            "name": "Payments",
+            "description": "Record and manage student payments — requires payments.* permissions"
+        },
+        {
+            "name": "Guardians",
+            "description": "Student guardian / parent management — nested under /api/v1/{channel_slug}/students/{student}/guardians"
+        },
+        {
+            "name": "Students",
+            "description": "Student management — all routes under /api/v1/{channel_slug}/students"
         },
         {
             "name": "Resources",

@@ -9,6 +9,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Modules\Channel\App\Models\Channel;
+use Modules\Channel\App\Models\Role;
 use Modules\Channel\App\Events\UserRegistered;
 use Modules\Channel\App\Events\PasswordResetRequested;
 use Modules\Channel\App\Http\Resources\UserResource;
@@ -77,7 +78,10 @@ class ChannelController extends Controller
                 'type' => $data['channel_type'] ?? 'teacher',
             ]);
 
+            $ownerRole = Role::whereNull('channel_id')->where('name', 'owner')->first();
+
             $data['channel_id'] = $channel->id;
+            $data['role_id']    = $ownerRole?->id;
             $user = $this->userRepository->create($data);
 
             DB::commit();

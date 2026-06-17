@@ -25,8 +25,15 @@ Route::prefix('{channel_slug}')
         // Class grades
         Route::apiResource('class-grades', ClassGradeController::class);
 
-        // Subjects
-        Route::apiResource('subjects', SubjectController::class);
+        // Subjects — permission-gated
+        Route::middleware('check.permission:subjects.view')->group(function () {
+            Route::get('subjects',       [SubjectController::class, 'index']);
+            Route::get('subjects/{id}',  [SubjectController::class, 'show']);
+        });
+        Route::post('subjects',          [SubjectController::class, 'store'])->middleware('check.permission:subjects.create');
+        Route::put('subjects/{id}',      [SubjectController::class, 'update'])->middleware('check.permission:subjects.update');
+        Route::patch('subjects/{id}',    [SubjectController::class, 'update'])->middleware('check.permission:subjects.update');
+        Route::delete('subjects/{id}',   [SubjectController::class, 'destroy'])->middleware('check.permission:subjects.delete');
 
         // Groups (will gain course nesting in Fix B — CourseController added then)
         Route::apiResource('groups', GroupController::class);
@@ -38,10 +45,17 @@ Route::prefix('{channel_slug}')
         Route::put('groups/{groupId}/users/{userId}',      [GroupUserController::class, 'update']);
         Route::delete('groups/{groupId}/users/{userId}',   [GroupUserController::class, 'destroy']);
 
-        // Student enrollments
-        Route::apiResource('student-enrollments', StudentEnrollmentController::class);
-        Route::get('students/{studentId}/enrollments', [StudentEnrollmentController::class, 'getByStudent']);
-        Route::get('groups/{groupId}/enrollments',     [StudentEnrollmentController::class, 'getByGroup']);
+        // Student enrollments — permission-gated
+        Route::middleware('check.permission:students.view')->group(function () {
+            Route::get('student-enrollments',              [StudentEnrollmentController::class, 'index']);
+            Route::get('student-enrollments/{id}',         [StudentEnrollmentController::class, 'show']);
+            Route::get('students/{studentId}/enrollments', [StudentEnrollmentController::class, 'getByStudent']);
+            Route::get('groups/{groupId}/enrollments',     [StudentEnrollmentController::class, 'getByGroup']);
+        });
+        Route::post('student-enrollments',        [StudentEnrollmentController::class, 'store'])->middleware('check.permission:students.create');
+        Route::put('student-enrollments/{id}',    [StudentEnrollmentController::class, 'update'])->middleware('check.permission:students.update');
+        Route::patch('student-enrollments/{id}',  [StudentEnrollmentController::class, 'update'])->middleware('check.permission:students.update');
+        Route::delete('student-enrollments/{id}', [StudentEnrollmentController::class, 'destroy'])->middleware('check.permission:students.delete');
 
         // Courses
         Route::apiResource('courses', CourseController::class);

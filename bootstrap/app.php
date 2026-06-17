@@ -19,7 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(HandleCors::class);
         $middleware->append(SetLocale::class);
         $middleware->alias([
-            'identify.tenant' => \Modules\Core\App\Http\Middleware\IdentifyTenant::class,
+            'identify.tenant'   => \Modules\Core\App\Http\Middleware\IdentifyTenant::class,
+            'check.permission'  => \Modules\Core\App\Http\Middleware\CheckPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
