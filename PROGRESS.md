@@ -21,8 +21,8 @@ Last updated: 2026-06-17
 | P5 | Parent / Guardian | ✅ Done | 2026-06-09 |
 | P6 | Sessions (dated instances) | ✅ Done (P0-C) | — |
 | P7 | Enrollment + Payment Dues | ✅ Done | 2026-06-17 |
-| P8 | Attendance QR + Realtime | ⬜ Pending | P0 |
-| P9 | Exam Module | ⬜ Pending | P0 |
+| P8 | Attendance QR + Realtime | ✅ Done | 2026-06-17 |
+| P9 | Exam Module | ✅ Done | 2026-06-21 |
 | P10 | Assignment Module | ⬜ Pending | P9 |
 | P11 | Notifications | ⬜ Pending | P7 |
 | P12 | Student Portal | ⬜ Pending | P7, P9, P10 |
@@ -39,6 +39,7 @@ Last updated: 2026-06-17
 | QR after manual absent | BLOCK — no override |
 | Overpayment | REJECT |
 | Exam retakes | Configurable per exam (`allow_retake` + `max_attempts`) |
+| Exam essay auto-grade | Objective (MCQ/T-F) auto-graded on submit; essay/short-answer requires teacher grade |
 | Live recording Phase 1 | DEFER |
 | Notifications | Email only |
 | Mid-month enrollment | PRORATE |

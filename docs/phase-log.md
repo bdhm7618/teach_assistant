@@ -225,3 +225,102 @@
 - `group_sessions` name is intentional (avoids conflict with Laravel's `sessions` table)
 - `session_times` name is accurate and descriptive enough
 - All other table names match the BRD plan
+
+---
+
+## Phase 8 — Attendance QR + Realtime — 2026-06-17
+
+### Created
+- `modules/Academic/database/migrations/2026_06_17_000002_add_qr_to_group_sessions.php` — adds `qr_token` (unique) + `qr_expires_at` to `group_sessions`
+- `modules/Attendance/app/Events/AttendanceRecorded.php` — fires after every attendance record; ready for Reverb/Pusher broadcasting
+
+### Modified
+- `modules/Academic/app/Models/Session.php` — added `qr_token`/`qr_expires_at` to fillable; added `refreshQrToken()` (HMAC-signed token, expiry = scheduled_at + duration + 30 min) and `parseQrToken()` static; added `attendances()` relationship
+- `modules/Academic/app/Http/Controllers/V1/SessionController.php` — added `generateQr()` with `@OA\` annotation
+- `modules/Academic/routes/api-v1.php` — added `POST groups/{group}/sessions/{session}/qr`; added `check.permission` gates to session write routes
+- `modules/Attendance/app/Models/Attendance.php` — added `session_id` to fillable; added `session()` BelongsTo relationship
+- `modules/Attendance/app/Http/Requests/V1/AttendanceRequest.php` — added `session_id` field; duplicate check now scoped to `session_id` when provided
+- `modules/Attendance/app/Http/Resources/V1/AttendanceResource.php` — added `session_id` + `session` (whenLoaded)
+- `modules/Attendance/app/Repositories/AttendanceRepository.php` — `exists()` accepts optional `session_id`; added `getBySession()` method
+- `modules/Attendance/app/Http/Controllers/V1/AttendanceController.php` — full rewrite: added `qrScan()` (token verify + 15-min late rule + block-if-absent), `sessionLive()` (polling endpoint), updated `bulkStore()` with session_id; full `@OA\` Swagger on all 8 endpoints
+- `modules/Attendance/routes/api-v1.php` — `check.permission:attendance.view/manage` gates; added `qr-scan` + `sessions/{session}/attendance` routes
+- `modules/Attendance/resources/lang/en/app.php` + `ar/app.php` — added `qr.*` and `live_retrieved` keys
+
+### Business rules enforced
+| Rule | Where |
+|------|-------|
+| QR scan > 15 min after `scheduled_at` → `late` | `AttendanceController::qrScan()` |
+| QR scan when student manually `absent` → BLOCK (409) | `AttendanceController::qrScan()` |
+| QR token signed with HMAC-SHA256 (app key) | `Session::refreshQrToken()` / `parseQrToken()` |
+| QR expires at session end + 30 min grace | `Session::refreshQrToken()` |
+
+### Realtime strategy
+- `AttendanceRecorded` event fired on every record creation — wire to Reverb/Pusher when ready
+- Polling endpoint `GET /sessions/{session}/attendance` returns live attendance counts + records
+- No external WebSocket dependency for MVP
+
+### Pending migration (run when WAMP MySQL is started)
+- `2026_06_17_000002_add_qr_to_group_sessions` — adds `qr_token` + `qr_expires_at` to `group_sessions`
+
+---
+
+## Phase 9 — Exam Module — 2026-06-21
+
+### Created
+**Module:** `modules/Exam/` (new nwidart module)
+
+**Providers:**
+- `modules/Exam/app/Providers/ExamServiceProvider.php`
+- `modules/Exam/app/Providers/EventServiceProvider.php`
+- `modules/Exam/app/Providers/RouteServiceProvider.php`
+
+**Migrations (5, pending WAMP start):**
+- `2026_06_21_000001_create_exams_table` — `allow_retake`, `max_attempts`, `status`, `starts_at`, `ends_at`
+- `2026_06_21_000002_create_exam_questions_table` — `type` (mcq|true_false|short_answer|essay), `marks`, `order`
+- `2026_06_21_000003_create_exam_options_table` — MCQ/T-F answer choices with `is_correct`
+- `2026_06_21_000004_create_exam_submissions_table` — student attempts with auto-grade result fields
+- `2026_06_21_000005_create_exam_answers_table` — per-question student responses
+
+**Models:**
+- `modules/Exam/app/Models/Exam.php` — HasChannelScope + SoftDeletes; `canBeAttemptedBy()` enforces max_attempts + window
+- `modules/Exam/app/Models/ExamQuestion.php` — `isObjective()` helper
+- `modules/Exam/app/Models/ExamOption.php`
+- `modules/Exam/app/Models/ExamSubmission.php` — `autoGrade()` auto-scores MCQ/T-F; recalculates totals; sets `is_pass`
+- `modules/Exam/app/Models/ExamAnswer.php`
+
+**Repository:**
+- `modules/Exam/app/Repositories/ExamRepository.php`
+
+**Controllers (3, full @OA\ Swagger):**
+- `modules/Exam/app/Http/Controllers/V1/ExamController.php` — 7 endpoints: CRUD + publish + close + results
+- `modules/Exam/app/Http/Controllers/V1/ExamQuestionController.php` — 5 endpoints: CRUD nested under exam
+- `modules/Exam/app/Http/Controllers/V1/ExamSubmissionController.php` — 5 endpoints: list + start + submit + show + grade
+
+**Requests (4):**
+- `ExamRequest`, `ExamQuestionRequest`, `ExamSubmitRequest`, `ExamGradeRequest`
+
+**Resources (5):**
+- `ExamResource`, `ExamQuestionResource`, `ExamOptionResource`, `ExamSubmissionResource`, `ExamAnswerResource`
+
+**Routes:** `modules/Exam/routes/api-v1.php`
+**Lang:** `modules/Exam/resources/lang/en/app.php` + `ar/app.php`
+
+### Modified
+- `modules_statuses.json` — added `"Exam": true`
+- `modules/Channel/database/seeders/RoleSeeder.php` — added `exams.*` permissions to teacher; `exams.view` to assistant + viewer
+
+### Business rules enforced
+| Rule | Where |
+|------|-------|
+| Locked: `allow_retake` + `max_attempts` per exam | `Exam::canBeAttemptedBy()` |
+| MCQ/T-F auto-graded on submit | `ExamSubmission::autoGrade()` |
+| Essay/short-answer waits for teacher grade | `autoGrade()` sets status `submitted` not `graded` |
+| Cannot publish exam with 0 questions | `ExamController::publish()` |
+| Cannot edit published exam with submissions | `ExamController::update()` |
+| Cannot delete exam with submissions | `ExamController::destroy()` |
+| Cannot modify closed exam questions | `ExamQuestionController` |
+| `is_correct` hidden from students during attempt | `ExamOptionResource` (route-based gate) |
+
+### Pending migrations (run when WAMP MySQL is started)
+- All 5 exam migrations
+- `2026_06_17_000002_add_qr_to_group_sessions` (P8, still pending)

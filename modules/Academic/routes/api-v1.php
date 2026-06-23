@@ -62,8 +62,10 @@ Route::prefix('{channel_slug}')
 
         // Sessions — individual dated class records
         Route::get('groups/{group}/sessions',              [SessionController::class, 'index']);
-        Route::post('groups/{group}/sessions',             [SessionController::class, 'store']);
+        Route::post('groups/{group}/sessions',             [SessionController::class, 'store'])->middleware('check.permission:sessions.create');
         Route::get('groups/{group}/sessions/{session}',    [SessionController::class, 'show']);
-        Route::patch('groups/{group}/sessions/{session}',  [SessionController::class, 'update']);
-        Route::delete('groups/{group}/sessions/{session}', [SessionController::class, 'destroy']);
+        Route::patch('groups/{group}/sessions/{session}',  [SessionController::class, 'update'])->middleware('check.permission:sessions.update');
+        Route::delete('groups/{group}/sessions/{session}', [SessionController::class, 'destroy'])->middleware('check.permission:sessions.create');
+        // QR generation — teacher generates QR for a session
+        Route::post('groups/{group}/sessions/{session}/qr', [SessionController::class, 'generateQr'])->middleware('check.permission:sessions.create');
     });

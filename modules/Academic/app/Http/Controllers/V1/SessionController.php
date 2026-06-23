@@ -178,6 +178,44 @@ class SessionController extends Controller
         }
     }
 
+    // ─── QR generation ───────────────────────────────────────────────────────
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/{channel_slug}/groups/{group}/sessions/{session}/qr",
+     *     summary="Generate (or regenerate) a signed QR token for a session",
+     *     tags={"Sessions"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="channel_slug", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="group",   in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="session", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="QR token — render this as a QR code on the frontend",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="qr_token",      type="string"),
+     *             @OA\Property(property="qr_expires_at", type="string", format="date-time"),
+     *             @OA\Property(property="session_id",    type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(response=403, description="Requires sessions.create"),
+     *     @OA\Response(response=404, description="Session not found")
+     * )
+     */
+    public function generateQr(int $groupId, int $sessionId)
+    {
+        try {
+            $session = Session::where('group_id', $groupId)->findOrFail($sessionId);
+            $session = $session->refreshQrToken();
+
+            return successResponse([
+                'qr_token'      => $session->qr_token,
+                'qr_expires_at' => $session->qr_expires_at->toDateTimeString(),
+                'session_id'    => $session->id,
+            ], 'QR token generated');
+        } catch (\Exception $e) {
+            return errorResponse('Operation failed', $e);
+        }
+    }
+
     /**
      * @OA\Delete(
      *     path="/api/v1/{channel_slug}/groups/{group}/sessions/{session}",

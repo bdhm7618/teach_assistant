@@ -7,5 +7,6 @@
     "Academic": true,
     "Student": true,
     "Attendance": true,
-    "Payment": true
+    "Payment": true,
+    "Exam": true
 }

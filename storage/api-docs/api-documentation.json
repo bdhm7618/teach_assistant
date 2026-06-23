@@ -790,6 +790,76 @@
                 ]
             }
         },
+        "/api/v1/{channel_slug}/groups/{group}/sessions/{session}/qr": {
+            "post": {
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Generate (or regenerate) a signed QR token for a session",
+                "operationId": "996910075d8ebad4595b05a74f61b837",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "group",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "QR token — render this as a QR code on the frontend",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "qr_token": {
+                                            "type": "string"
+                                        },
+                                        "qr_expires_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "session_id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Requires sessions.create"
+                    },
+                    "404": {
+                        "description": "Session not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/{channel_slug}/student-enrollments": {
             "get": {
                 "tags": [
@@ -1522,6 +1592,493 @@
                     },
                     "404": {
                         "description": "Subject not found or belongs to another channel"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/attendances": {
+            "post": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Manually mark a student's attendance",
+                "operationId": "c0b8558d8df69c268fb9b91b354d64f0",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "student_id",
+                                    "group_id",
+                                    "date",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "student_id": {
+                                        "type": "integer"
+                                    },
+                                    "group_id": {
+                                        "type": "integer"
+                                    },
+                                    "session_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "session_time_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "present",
+                                            "absent",
+                                            "late",
+                                            "excused"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Attendance recorded"
+                    },
+                    "403": {
+                        "description": "Requires attendance.manage"
+                    },
+                    "422": {
+                        "description": "Validation error or duplicate"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/attendances/{id}": {
+            "put": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Update an attendance record",
+                "operationId": "419c0cff3e78c6a3e3013aa8743be655",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "present",
+                                            "absent",
+                                            "late",
+                                            "excused"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Requires attendance.manage"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Delete an attendance record",
+                "operationId": "aea90b7267bce5c78ee46d5b7bb6eaa4",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Requires attendance.manage"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/attendances/bulk": {
+            "post": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Bulk-mark attendance for a session",
+                "operationId": "3c5bd7fe8f55694e6f4c6714b092caef",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "attendances"
+                                ],
+                                "properties": {
+                                    "session_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "attendances": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "student_id": {
+                                                    "type": "integer"
+                                                },
+                                                "group_id": {
+                                                    "type": "integer"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "present",
+                                                        "absent",
+                                                        "late",
+                                                        "excused"
+                                                    ]
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "notes": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Attendance records created"
+                    },
+                    "403": {
+                        "description": "Requires attendance.manage"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/attendances/qr-scan": {
+            "post": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Student scans QR code — auto-detects present vs late",
+                "operationId": "d2d369c59de0b0eb730b4d33bad3fd4f",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token",
+                                    "student_id"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "description": "QR token from session QR endpoint",
+                                        "type": "string"
+                                    },
+                                    "student_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Attendance recorded — status auto-set to present or late"
+                    },
+                    "400": {
+                        "description": "Invalid or expired QR token"
+                    },
+                    "409": {
+                        "description": "Student was manually marked absent — QR scan blocked"
+                    },
+                    "422": {
+                        "description": "Student already checked in for this session"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/sessions/{session}/attendance": {
+            "get": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Live attendance for a session — poll this for realtime updates",
+                "operationId": "2057a42337726912cba1ca6609de6d80",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Current attendance state with summary counts"
+                    },
+                    "403": {
+                        "description": "Requires attendance.view"
+                    },
+                    "404": {
+                        "description": "Session not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/attendances/statistics/student/{studentId}": {
+            "get": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Attendance statistics for a student",
+                "operationId": "21dc6b3354ae84f4dd9cdcc7c2eb3229",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "studentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statistics: total, present, absent, late, excused, attendance_rate"
+                    },
+                    "403": {
+                        "description": "Requires attendance.view"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{channel_slug}/attendances/statistics/group/{groupId}": {
+            "get": {
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Attendance statistics for a group",
+                "operationId": "cf385138e1c1bb8978f9a85bbbac817a",
+                "parameters": [
+                    {
+                        "name": "channel_slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statistics object"
+                    },
+                    "403": {
+                        "description": "Requires attendance.view"
                     }
                 },
                 "security": [
@@ -4224,6 +4781,10 @@
         {
             "name": "Subjects",
             "description": "Subject management — channel-specific and general subjects. All routes under /api/v1/{channel_slug}/subjects"
+        },
+        {
+            "name": "Attendance",
+            "description": "Attendance management — manual marking, QR scan, live session view"
         },
         {
             "name": "Auth",
