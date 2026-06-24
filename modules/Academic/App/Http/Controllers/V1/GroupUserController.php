@@ -2,7 +2,7 @@
 
 namespace Modules\Academic\App\Http\Controllers\V1;
 
-use Modules\Channel\App\Http\Controllers\V1\BaseController;
+use App\Http\Controllers\Controller;
 use Modules\Academic\App\Models\Group;
 use Modules\Academic\App\Models\GroupUser;
 use Modules\Channel\App\Models\User;
@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class GroupUserController extends BaseController
+class GroupUserController extends Controller
 {
     public function index($groupId)
     {

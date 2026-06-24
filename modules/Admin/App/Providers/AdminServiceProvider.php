@@ -5,6 +5,8 @@ namespace Modules\Admin\App\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
+use Modules\Admin\App\Providers\EventServiceProvider;
+use Modules\Admin\App\Providers\RouteServiceProvider;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 

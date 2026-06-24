@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
+use Modules\Payment\App\Models\Payment;
+use Modules\Payment\App\Models\Installment;
 
 class Invoice extends Model
 {
@@ -16,6 +18,7 @@ class Invoice extends Model
         'invoice_number',
         'student_id',
         'group_id',
+        'enrollment_id',
         'total_amount',
         'discount_amount',
         'final_amount',
@@ -24,6 +27,8 @@ class Invoice extends Model
         'due_date',
         'issue_date',
         'status',
+        'type',
+        'reason',
         'notes',
         'channel_id',
     ];

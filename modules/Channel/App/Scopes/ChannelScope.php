@@ -67,16 +67,20 @@ class ChannelScope implements Scope
     }
 
     /**
-     * Get the channel_id from the authenticated user
-     * Only applies when user is authenticated via 'user' guard (not 'admin')
+     * Get the channel_id — prefers middleware-resolved value, falls back to auth user.
+     * Admin guard bypasses channel scope entirely.
      *
      * @return int|null
      */
-    protected function getChannelId()
+    protected function getChannelId(): ?int
     {
-        // Only apply scope if user is authenticated via 'user' guard
-        // Admin guard should not have channel scope applied
-        if (auth("user")->check()) {
+        // Middleware-resolved channel (slug routing) takes priority
+        if (app()->has('current_channel_id')) {
+            return app('current_channel_id');
+        }
+
+        // Fallback: derive from authenticated user (non-slug routes or tests)
+        if (auth('user')->check()) {
             return auth('user')->user()?->channel_id;
         }
 

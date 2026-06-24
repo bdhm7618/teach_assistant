@@ -7,6 +7,7 @@ return [
         'updated' => 'Channel updated successfully.',
         'deleted' => 'Channel deleted successfully.',
         'not_found' => 'Channel not found.',
+        'suspended' => 'This channel is suspended or cancelled. Please contact support.',
         'already_exists' => 'A channel with this name already exists.',
     ],
 
@@ -73,17 +74,31 @@ return [
         'ignore_if_not_you' =>
         'If you did not create an account, no further action is required.',
 
+        'reset_password_subject' => 'Reset Your Password',
+
+        'reset_password_title' => 'Password Reset',
+
+        'reset_password_text' =>
+        'We received a request to reset your password. Use the code below to proceed.',
+
+        'reset_otp_expire' =>
+        'This code will expire in 15 minutes.',
+
     ],
     'otp' => [
         'invalid' => 'The OTP you entered is invalid.',
         'expired' => 'The OTP has expired.',
         'validated' => 'OTP validated successfully.',
+        'resent' => 'A new verification code has been sent to your email.',
     ],
 
     'auth' => [
         'invalid_credentials' => 'Invalid credentials.',
         'login_success' => 'Login successful.',
         'blocked' => 'Account blocked.',
+        'logout_success' => 'Logged out successfully.',
+        'token_refreshed' => 'Token refreshed successfully.',
+        'token_expired' => 'Token has expired or is invalid.',
     ],
     'password' => [
         'reset_otp_sent' => 'Password reset OTP has been sent.',

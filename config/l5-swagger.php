@@ -122,11 +122,14 @@ return [
             ],
 
             /**
-             * analyser: defaults to \OpenApi\StaticAnalyser .
+             * analyser: include DocBlockAnnotationFactory so @OA\ PHPDoc annotations are parsed.
              *
              * @see \OpenApi\scan
              */
-            'analyser' => null,
+            'analyser' => new \OpenApi\Analysers\ReflectionAnalyser([
+                new \OpenApi\Analysers\DocBlockAnnotationFactory(),
+                new \OpenApi\Analysers\AttributeAnnotationFactory(),
+            ]),
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .

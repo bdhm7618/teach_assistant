@@ -14,6 +14,7 @@ class Attendance extends Model
     protected $fillable = [
         'student_id',
         'group_id',
+        'session_id',
         'session_time_id',
         'date',
         'status',
@@ -67,6 +68,14 @@ class Attendance extends Model
     public function sessionTime(): BelongsTo
     {
         return $this->belongsTo(\Modules\Academic\App\Models\SessionTime::class);
+    }
+
+    /**
+     * Get the session (dated class instance) this attendance belongs to
+     */
+    public function session(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Academic\App\Models\Session::class);
     }
 
     /**

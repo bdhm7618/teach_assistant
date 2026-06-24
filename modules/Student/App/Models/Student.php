@@ -121,5 +121,20 @@ class Student extends Authenticatable
     {
         return $query->where('status', 0);
     }
+
+    public function guardians()
+    {
+        return $this->hasMany(\Modules\Student\App\Models\Guardian::class);
+    }
+
+    public function primaryGuardian()
+    {
+        return $this->hasOne(\Modules\Student\App\Models\Guardian::class)->where('is_primary', true);
+    }
+
+    public function otps()
+    {
+        return $this->morphMany(\Modules\Core\App\Models\Otp::class, 'otpable');
+    }
 }
 

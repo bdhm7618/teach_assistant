@@ -3,62 +3,63 @@
 namespace Modules\Channel\App\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Modules\Channel\App\Models\Channel;
+use Modules\Channel\App\Models\Role;
 use Modules\Channel\App\Events\UserRegistered;
+use Modules\Channel\App\Events\PasswordResetRequested;
 use Modules\Channel\App\Http\Resources\UserResource;
 use Modules\Channel\App\Repositories\UserRepository;
 use Modules\Channel\App\Repositories\ChannelRepository;
-use Modules\Channel\App\Models\Role;
 use Modules\Channel\App\Http\Requests\V1\RegisterRequest;
+use Modules\Core\App\Repositories\OtpRepository;
 
 /**
- * @OA\Tag(
- *     name="Channel",
- *     description="Channel management endpoints"
- * )
+ * @OA\Tag(name="Auth", description="Authentication and channel registration")
+ * @OA\Tag(name="Channel", description="Channel management (slug-scoped)")
  */
 class ChannelController extends Controller
 {
-    protected $userRepository;
-    protected $channelRepository;
+    public function __construct(
+        protected UserRepository    $userRepository,
+        protected ChannelRepository $channelRepository,
+        protected OtpRepository     $otpRepository,
+    ) {}
 
-    public function __construct(UserRepository $userRepository, ChannelRepository $channelRepository)
-    {
-        $this->userRepository = $userRepository;
-        $this->channelRepository = $channelRepository;
-    }
+    // =========================================================================
+    // Public — no authentication required
+    // =========================================================================
 
     /**
-     * Register a new channel and user
-     * 
      * @OA\Post(
-     *     path="/api/v1/channel/register",
-     *     summary="Register a new channel and user",
-     *     tags={"Channel"},
+     *     path="/api/v1/auth/register",
+     *     summary="Register a new channel and owner user",
+     *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"channel_name", "name", "email", "phone", "gender", "password", "password_confirmation"},
-     *             @OA\Property(property="channel_name", type="string", example="My Channel"),
-     *             @OA\Property(property="name", type="string", example="John Doe"),
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
-     *             @OA\Property(property="phone", type="string", example="+1234567890"),
-     *             @OA\Property(property="gender", type="string", enum={"male", "female"}, example="male"),
-     *             @OA\Property(property="password", type="string", format="password", example="Password123!"),
-     *             @OA\Property(property="password_confirmation", type="string", format="password", example="Password123!")
+     *             required={"channel_name","channel_type","name","email","phone","gender","password","password_confirmation"},
+     *             @OA\Property(property="channel_name", type="string", example="Mohamed Math Lessons"),
+     *             @OA\Property(property="channel_type", type="string", enum={"teacher","center"}, example="teacher"),
+     *             @OA\Property(property="name", type="string", example="Mohamed Hassan"),
+     *             @OA\Property(property="email", type="string", format="email", example="mohamed@example.com"),
+     *             @OA\Property(property="phone", type="string", example="01001234567"),
+     *             @OA\Property(property="gender", type="string", enum={"male","female"}, example="male"),
+     *             @OA\Property(property="password", type="string", format="password", example="Secret123!"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="Secret123!")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Channel and user created successfully",
+     *     @OA\Response(response=201, description="Channel and user created — OTP sent to email",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string", example="Channel created successfully"),
-     *             @OA\Property(property="data", type="object")
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", type="object"),
+     *                 @OA\Property(property="channel_slug", type="string", example="mohamed-math-lessons")
+     *             )
      *         )
      *     ),
      *     @OA\Response(response=422, description="Validation error")
@@ -69,296 +70,377 @@ class ChannelController extends Controller
         $data = $request->validated();
 
         DB::beginTransaction();
-
         try {
-            // Create the channel
-            $channel = $this->channelRepository->create(["name" => $data['channel_name']]);
+            $slug    = $this->generateUniqueSlug($data['channel_name']);
+            $channel = $this->channelRepository->create([
+                'name' => $data['channel_name'],
+                'slug' => $slug,
+                'type' => $data['channel_type'] ?? 'teacher',
+            ]);
 
-            // Assign channel_id
-            $data["channel_id"] = $channel->id;
+            $ownerRole = Role::whereNull('channel_id')->where('name', 'owner')->first();
 
-            // Assign 'owner' role_id
-            $ownerRole = Role::where('name', 'owner')->first();
-            if ($ownerRole) {
-                $data["role_id"] = $ownerRole->id;
-            }
-
-            // Create the user
+            $data['channel_id'] = $channel->id;
+            $data['role_id']    = $ownerRole?->id;
             $user = $this->userRepository->create($data);
 
             DB::commit();
-
-            // Fire registration event
-            event(new UserRegistered($user));
-
-            return successResponse(new UserResource($user), trans("channel::app.channel.created"), 201);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            return errorResponse(trans("channel::app.common.operation_failed"), $e->getMessage());
+            return errorResponse(trans('channel::app.common.operation_failed'), $e);
         }
+
+        event(new UserRegistered($user));
+
+        return successResponse(
+            ['user' => new UserResource($user), 'channel_slug' => $slug],
+            trans('channel::app.channel.created'),
+            201
+        );
     }
 
-
     /**
-     * Validate OTP and return user with token
-     * 
      * @OA\Post(
-     *     path="/api/v1/channel/user/verify-email",
-     *     summary="Verify email with OTP",
-     *     tags={"Channel"},
+     *     path="/api/v1/auth/verify-email",
+     *     summary="Verify email with OTP code",
+     *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"email", "otp"},
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             required={"email","otp"},
+     *             @OA\Property(property="email", type="string", format="email", example="mohamed@example.com"),
      *             @OA\Property(property="otp", type="string", example="123456")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Email verified successfully",
+     *     @OA\Response(response=200, description="Email verified — JWT token returned",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="success", type="boolean"),
      *             @OA\Property(property="data", type="object"),
-     *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGc...")
+     *             @OA\Property(property="token", type="string")
      *         )
      *     ),
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\Response(response=422, description="Invalid or expired OTP")
      * )
      */
     public function validateOtp(Request $request)
     {
         $request->validate([
             'email' => 'required|string|exists:users,email',
-            'otp' => 'required',
+            'otp'   => 'required|string',
         ]);
 
         DB::beginTransaction();
-
         try {
             $user = $this->userRepository->findByField('email', $request->email)->first();
 
-            if (!$user) {
-                return errorResponse(trans('channel::app.user.not_found'));
+            if (! $user) {
+                return errorResponse(trans('channel::app.user.not_found'), null, 404);
             }
-
             if ($user->email_verified_at) {
-                return errorResponse(trans('channel::app.user.already_verified'));
+                return errorResponse(trans('channel::app.user.already_verified'), null, 422);
             }
 
-            $otpRecord = $user->otps()->latest()->first();
+            $otpRecord = $this->otpRepository->getLatestUnverified($user, 'email_verification');
 
-
-            if (!$otpRecord || $otpRecord->code != $request->otp) {
-                return errorResponse(trans('channel::app.otp.invalid'));
+            if (! $otpRecord || $otpRecord->code !== $request->otp) {
+                return errorResponse(trans('channel::app.otp.invalid'), null, 422);
             }
-
-            if ($otpRecord->expires_at && now()->gt($otpRecord->expires_at)) {
-                return errorResponse(trans('channel::app.otp.expired'));
+            if ($otpRecord->isExpired()) {
+                return errorResponse(trans('channel::app.otp.expired'), null, 422);
             }
 
             $user->email_verified_at = now();
             $user->save();
+
+            $this->otpRepository->markAsVerified($otpRecord);
 
             $token = JWTAuth::fromUser($user);
 
             DB::commit();
 
             return successResponse(
-                array_merge(
-                    (new UserResource($user))->toArray(request()),
-                    ['token' => $token]
-                ),
+                array_merge((new UserResource($user))->toArray(request()), ['token' => $token]),
                 trans('channel::app.otp.validated')
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             return errorResponse(trans('channel::app.common.operation_failed'), $e);
         }
     }
 
     /**
-     * User login
-     * 
      * @OA\Post(
-     *     path="/api/v1/channel/user/login",
-     *     summary="User login",
-     *     tags={"Channel"},
+     *     path="/api/v1/auth/resend-otp",
+     *     summary="Resend email verification OTP",
+     *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"email", "password"},
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="Password123!")
+     *             required={"email"},
+     *             @OA\Property(property="email", type="string", format="email", example="mohamed@example.com")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Login successful",
+     *     @OA\Response(response=200, description="OTP resent"),
+     *     @OA\Response(response=422, description="Already verified or user not found")
+     * )
+     */
+    public function resendOtp(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $user = $this->userRepository->findByField('email', $request->email)->first();
+
+        if (! $user) {
+            return errorResponse(trans('channel::app.user.not_found'), null, 404);
+        }
+        if ($user->email_verified_at) {
+            return errorResponse(trans('channel::app.user.already_verified'), null, 422);
+        }
+
+        event(new UserRegistered($user));
+
+        return successResponse(null, trans('channel::app.otp.resent'));
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/auth/login",
+     *     summary="Login with email or phone + password",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string"),
-     *             @OA\Property(property="data", type="object"),
-     *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGc...")
+     *             required={"password"},
+     *             @OA\Property(property="email", type="string", format="email", example="mohamed@example.com"),
+     *             @OA\Property(property="phone", type="string", example="01001234567"),
+     *             @OA\Property(property="password", type="string", format="password", example="Secret123!")
      *         )
      *     ),
+     *     @OA\Response(response=200, description="Login successful — JWT token returned"),
      *     @OA\Response(response=401, description="Invalid credentials"),
+     *     @OA\Response(response=403, description="Email not verified or account blocked"),
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email|exists:users,email',
+            'email'    => 'required_without:phone|string|email',
+            'phone'    => 'required_without:email|string',
             'password' => 'required|string',
         ]);
 
-        $user = $this->userRepository->where('email', $request->email)->first();
+        $user = $request->filled('phone')
+            ? $this->userRepository->findByField('phone', $request->phone)->first()
+            : $this->userRepository->findByField('email', $request->email)->first();
 
-        if (!$user) {
-            return errorResponse(trans('channel::app.user.not_found'));
+        if (! $user) {
+            return errorResponse(trans('channel::app.user.not_found'), null, 404);
         }
-
-        if (!$user->email_verified_at) {
-            return errorResponse(trans('channel::app.user.not_verified'));
+        if (! $user->email_verified_at) {
+            return errorResponse(trans('channel::app.user.not_verified'), null, 403);
         }
-
-        if (!Hash::check($request->password, $user->password)) {
-            return errorResponse(trans('channel::app.auth.invalid_credentials'));
+        if (! Hash::check($request->password, $user->password)) {
+            return errorResponse(trans('channel::app.auth.invalid_credentials'), null, 401);
         }
-
         if ($user->status == 0) {
-            return errorResponse(trans('channel::app.user.blocked'));
+            return errorResponse(trans('channel::app.auth.blocked'), null, 403);
         }
 
-       
         $token = JWTAuth::fromUser($user);
 
         return successResponse(
-            array_merge(
-                (new UserResource($user))->toArray($request),
-                ['token' => $token]
-            ),
+            array_merge((new UserResource($user))->toArray($request), ['token' => $token]),
             trans('channel::app.auth.login_success')
         );
     }
 
-
     /**
-     * Request password reset OTP
-     * 
      * @OA\Post(
-     *     path="/api/v1/channel/user/forget-password",
-     *     summary="Request password reset OTP",
-     *     tags={"Channel"},
+     *     path="/api/v1/auth/forget-password",
+     *     summary="Request a password-reset OTP via email",
+     *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             required={"email"},
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com")
+     *             @OA\Property(property="email", type="string", format="email", example="mohamed@example.com")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="OTP sent successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string")
-     *         )
-     *     ),
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\Response(response=200, description="OTP sent to email"),
+     *     @OA\Response(response=404, description="User not found")
      * )
      */
     public function forgetPassword(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
+        $request->validate(['email' => 'required|email|exists:users,email']);
 
-        $user = $this->userRepository->where('email', $request->email)->first();
-
-        if (!$user) {
-            return errorResponse(trans('channel::app.user.not_found'));
+        $user = $this->userRepository->findByField('email', $request->email)->first();
+        if (! $user) {
+            return errorResponse(trans('channel::app.user.not_found'), null, 404);
         }
 
-        event(new UserRegistered($user));
+        event(new PasswordResetRequested($user));
 
-        return successResponse(
-            null,
-            trans('channel::app.password.reset_otp_sent')
-        );
+        return successResponse(null, trans('channel::app.password.reset_otp_sent'));
     }
 
     /**
-     * Reset password with OTP
-     * 
      * @OA\Post(
-     *     path="/api/v1/channel/user/reset-password",
-     *     summary="Reset password with OTP",
-     *     tags={"Channel"},
+     *     path="/api/v1/auth/reset-password",
+     *     summary="Reset password using OTP",
+     *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"email", "otp", "password", "password_confirmation"},
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             required={"email","otp","password","password_confirmation"},
+     *             @OA\Property(property="email", type="string", format="email"),
      *             @OA\Property(property="otp", type="string", example="123456"),
-     *             @OA\Property(property="password", type="string", format="password", example="NewPassword123!"),
-     *             @OA\Property(property="password_confirmation", type="string", format="password", example="NewPassword123!")
+     *             @OA\Property(property="password", type="string", format="password", minLength=8),
+     *             @OA\Property(property="password_confirmation", type="string", format="password")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Password reset successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string"),
-     *             @OA\Property(property="data", type="object"),
-     *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGc...")
-     *         )
-     *     ),
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\Response(response=200, description="Password reset — JWT token returned"),
+     *     @OA\Response(response=422, description="Invalid or expired OTP")
      * )
      */
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
-            'otp' => 'required|string',
+            'email'    => 'required|email|exists:users,email',
+            'otp'      => 'required|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = $this->userRepository->where('email', $request->email)->first();
-
-        if (!$user) {
-            return errorResponse(trans('channel::app.user.not_found'));
+        $user = $this->userRepository->findByField('email', $request->email)->first();
+        if (! $user) {
+            return errorResponse(trans('channel::app.user.not_found'), null, 404);
         }
 
-        $otpRecord = $user->otps()->latest()->first();
+        $otpRecord = $this->otpRepository->getLatestUnverified($user, 'password_reset');
 
-        if (!$otpRecord || $otpRecord->code !== $request->otp) {
-            return errorResponse(trans('channel::app.otp.invalid'));
+        if (! $otpRecord || $otpRecord->code !== $request->otp) {
+            return errorResponse(trans('channel::app.otp.invalid'), null, 422);
+        }
+        if ($otpRecord->isExpired()) {
+            return errorResponse(trans('channel::app.otp.expired'), null, 422);
         }
 
-        if ($otpRecord->expires_at && now()->gt($otpRecord->expires_at)) {
-            return errorResponse(trans('channel::app.otp.expired'));
+        DB::beginTransaction();
+        try {
+            $user->update(['password' => bcrypt($request->password)]);
+            $this->otpRepository->markAsVerified($otpRecord);
+
+            $token = JWTAuth::fromUser($user);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return errorResponse(trans('channel::app.common.operation_failed'), $e);
         }
-
-        $user->update([
-            'password' => bcrypt($request->password),
-        ]);
-
-        $user->otps()->delete();
-
-     
-        $token = JWTAuth::fromUser($user);
 
         return successResponse(
-            array_merge(
-                (new UserResource($user))->toArray($request),
-                ['token' => $token]
-            ),
+            array_merge((new UserResource($user))->toArray($request), ['token' => $token]),
             trans('channel::app.password.reset_success')
         );
+    }
+
+    // =========================================================================
+    // Protected — JWT required
+    // =========================================================================
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/{channel_slug}/auth/me",
+     *     summary="Get authenticated user",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="channel_slug", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Authenticated user data"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Channel not found")
+     * )
+     */
+    public function me(Request $request)
+    {
+        $user = auth('user')->user();
+        return successResponse(new UserResource($user), trans('channel::app.common.show_success'));
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/{channel_slug}/auth/logout",
+     *     summary="Logout — invalidate JWT token",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="channel_slug", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Logged out successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function logout()
+    {
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return successResponse(null, trans('channel::app.auth.logout_success'));
+        } catch (\Throwable $e) {
+            return errorResponse(trans('channel::app.common.operation_failed'), $e);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/{channel_slug}/auth/refresh",
+     *     summary="Refresh JWT token",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="channel_slug", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="New token returned",
+     *         @OA\JsonContent(@OA\Property(property="token", type="string"))
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function refreshToken()
+    {
+        try {
+            $token = JWTAuth::refresh(JWTAuth::getToken());
+            return successResponse(['token' => $token], trans('channel::app.auth.token_refreshed'));
+        } catch (\Throwable $e) {
+            return errorResponse(trans('channel::app.auth.token_expired'), null, 401);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/{channel_slug}/channel",
+     *     summary="Get current channel info",
+     *     tags={"Channel"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="channel_slug", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Channel info"),
+     *     @OA\Response(response=404, description="Channel not found"),
+     *     @OA\Response(response=403, description="Channel suspended")
+     * )
+     */
+    public function show(Request $request)
+    {
+        $channel = app('current_channel');
+        return successResponse($channel, trans('channel::app.common.show_success'));
+    }
+
+    // =========================================================================
+    // Private helpers
+    // =========================================================================
+
+    private function generateUniqueSlug(string $name): string
+    {
+        $base = Str::slug($name) ?: 'channel';
+        $slug = $base;
+        $i    = 1;
+        while (Channel::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i++;
+        }
+        return $slug;
     }
 }

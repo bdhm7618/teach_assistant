@@ -37,9 +37,23 @@ class StudentResource extends JsonResource
                     ];
                 });
             }),
+            'guardians' => $this->whenLoaded('guardians', fn () =>
+                $this->guardians->map(fn ($g) => [
+                    'id'           => $g->id,
+                    'name'         => $g->name,
+                    'phone'        => $g->phone,
+                    'relationship' => $g->relationship,
+                    'is_primary'   => (bool) $g->is_primary,
+                ])
+            ),
+            'primary_guardian' => $this->whenLoaded('primaryGuardian', fn () =>
+                $this->primaryGuardian ? [
+                    'id'    => $this->primaryGuardian->id,
+                    'name'  => $this->primaryGuardian->name,
+                    'phone' => $this->primaryGuardian->phone,
+                ] : null
+            ),
             'groups_count' => $this->when(isset($this->groups_count), $this->groups_count),
-            'attendances_count' => $this->when(isset($this->attendances_count), $this->attendances_count),
-            'payments_count' => $this->when(isset($this->payments_count), $this->payments_count),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

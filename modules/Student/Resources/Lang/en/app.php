@@ -9,6 +9,13 @@ return [
         'list_success' => 'Students list retrieved successfully.',
         'show_success' => 'Student retrieved successfully.',
     ],
+    'guardian' => [
+        'created'      => 'Guardian added successfully.',
+        'updated'      => 'Guardian updated successfully.',
+        'deleted'      => 'Guardian removed successfully.',
+        'not_found'    => 'Guardian not found.',
+        'list_success' => 'Guardians retrieved successfully.',
+    ],
     'validation' => [
         'student_duplicate' => 'Student with this information already exists in this channel.',
         'email_exists' => 'This email is already registered.',
