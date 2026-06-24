@@ -10,6 +10,7 @@ use Modules\Exam\App\Models\Exam;
 use Modules\Exam\App\Repositories\ExamRepository;
 use Modules\Exam\App\Http\Requests\V1\ExamRequest;
 use Modules\Exam\App\Http\Resources\V1\ExamResource;
+use Modules\Exam\App\Events\ExamPublished;
 
 /**
  * @OA\Tag(name="Exams", description="Exam management — create, publish, and manage exams per group")
@@ -209,6 +210,8 @@ class ExamController extends BaseController
         }
 
         $exam->update(['status' => 'published']);
+
+        ExamPublished::dispatch($exam->fresh());
 
         return $this->successResponse(
             new ExamResource($exam->fresh()),

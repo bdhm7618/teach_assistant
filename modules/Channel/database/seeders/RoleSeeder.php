@@ -30,6 +30,7 @@ class RoleSeeder extends Seeder
                     'students.view',
                     'attendance.view', 'attendance.manage',
                     'exams.view', 'exams.create', 'exams.update', 'exams.delete',
+                    'assignments.view', 'assignments.create', 'assignments.update', 'assignments.delete',
                     'reports.view',
                 ],
             ],
@@ -45,6 +46,7 @@ class RoleSeeder extends Seeder
                     'students.view', 'students.create',
                     'attendance.view', 'attendance.manage',
                     'exams.view',
+                    'assignments.view',
                 ],
             ],
 
@@ -59,6 +61,7 @@ class RoleSeeder extends Seeder
                     'students.view',
                     'attendance.view',
                     'exams.view',
+                    'assignments.view',
                     'reports.view',
                 ],
             ],

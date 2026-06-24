@@ -1,6 +1,6 @@
 # Channel Project — Implementation Progress
 
-Last updated: 2026-06-17
+Last updated: 2026-06-24
 
 ## Phase 0 — Architecture Fixes
 
@@ -23,9 +23,9 @@ Last updated: 2026-06-17
 | P7 | Enrollment + Payment Dues | ✅ Done | 2026-06-17 |
 | P8 | Attendance QR + Realtime | ✅ Done | 2026-06-17 |
 | P9 | Exam Module | ✅ Done | 2026-06-21 |
-| P10 | Assignment Module | ⬜ Pending | P9 |
-| P11 | Notifications | ⬜ Pending | P7 |
-| P12 | Student Portal | ⬜ Pending | P7, P9, P10 |
+| P10 | Assignment Module | ✅ Done | 2026-06-24 |
+| P11 | Notifications | ✅ Done | 2026-06-24 |
+| P12 | Student Portal | ✅ Done | 2026-06-24 |
 | P13 | Parent Portal | ⬜ Pending | P5, P12 |
 | P14 | Live Sessions (WebRTC) | ⬜ Pending | P8 |
 | P15 | Platform Admin | ⬜ Pending | All |

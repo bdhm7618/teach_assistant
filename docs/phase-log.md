@@ -324,3 +324,150 @@
 ### Pending migrations (run when WAMP MySQL is started)
 - All 5 exam migrations
 - `2026_06_17_000002_add_qr_to_group_sessions` (P8, still pending)
+
+## Phase P10 — Assignment Module — 2026-06-24
+
+### Created
+- `modules/Assignment/database/migrations/2026_06_24_000001_create_assignments_table.php`
+- `modules/Assignment/database/migrations/2026_06_24_000002_create_assignment_submissions_table.php`
+- `modules/Assignment/database/migrations/2026_06_24_000003_create_assignment_attachments_table.php`
+- `modules/Assignment/app/Models/Assignment.php`
+- `modules/Assignment/app/Models/AssignmentSubmission.php`
+- `modules/Assignment/app/Models/AssignmentAttachment.php`
+- `modules/Assignment/app/Repositories/AssignmentRepository.php`
+- `modules/Assignment/app/Http/Requests/V1/AssignmentRequest.php`
+- `modules/Assignment/app/Http/Requests/V1/AssignmentSubmitRequest.php`
+- `modules/Assignment/app/Http/Requests/V1/AssignmentGradeRequest.php`
+- `modules/Assignment/app/Http/Resources/V1/AssignmentResource.php`
+- `modules/Assignment/app/Http/Resources/V1/AssignmentSubmissionResource.php`
+- `modules/Assignment/app/Http/Resources/V1/AssignmentAttachmentResource.php`
+- `modules/Assignment/app/Http/Controllers/V1/AssignmentController.php`
+- `modules/Assignment/app/Http/Controllers/V1/AssignmentSubmissionController.php`
+- `modules/Assignment/app/Providers/AssignmentServiceProvider.php`
+- `modules/Assignment/app/Providers/EventServiceProvider.php`
+- `modules/Assignment/app/Providers/RouteServiceProvider.php`
+- `modules/Assignment/routes/api-v1.php`
+- `modules/Assignment/resources/lang/en/app.php`
+- `modules/Assignment/resources/lang/ar/app.php`
+
+### Modified
+- `modules_statuses.json` — added `"Assignment": true`
+- `modules/Channel/database/seeders/RoleSeeder.php` — added `assignments.*` to teacher, `assignments.view` to assistant and viewer
+
+### Key design decisions
+| Decision | Value |
+|---|---|
+| One submission per student per assignment | Unique constraint `(assignment_id, student_id)` — no retakes |
+| Late submission | Configurable per assignment (`allow_late_submission` + `late_penalty_percent`) |
+| Late penalty | Applied at grade time: `marks - (marks * penalty%)` |
+| File attachments | Both teacher (assignment brief) and student (submission files) supported via `assignment_attachments` table |
+| Answer | Either `answer_text` (string) OR file attachments — at least one required |
+| Auto-grade | None — all assignments are teacher-graded |
+
+### Pending migrations (run when WAMP MySQL is started)
+- `2026_06_24_000001_create_assignments_table`
+- `2026_06_24_000002_create_assignment_submissions_table`
+- `2026_06_24_000003_create_assignment_attachments_table`
+- All 5 exam migrations (P9, still pending)
+- `2026_06_17_000002_add_qr_to_group_sessions` (P8, still pending)
+
+## Phase P11 — Notifications (Email) — 2026-06-24
+
+### Created — Notification module
+- `modules/Notification/database/migrations/2026_06_24_000010_create_notification_logs_table.php`
+- `modules/Notification/app/Models/NotificationLog.php`
+- `modules/Notification/app/Services/NotificationService.php`
+- `modules/Notification/app/Notifications/EnrollmentConfirmedNotification.php`
+- `modules/Notification/app/Notifications/InvoiceCreatedNotification.php`
+- `modules/Notification/app/Notifications/InvoiceOverdueNotification.php`
+- `modules/Notification/app/Notifications/ExamPublishedNotification.php`
+- `modules/Notification/app/Notifications/AssignmentPublishedNotification.php`
+- `modules/Notification/app/Notifications/SubmissionGradedNotification.php`
+- `modules/Notification/app/Listeners/SendEnrollmentNotification.php`
+- `modules/Notification/app/Listeners/SendExamPublishedNotification.php`
+- `modules/Notification/app/Listeners/SendAssignmentPublishedNotification.php`
+- `modules/Notification/app/Listeners/SendInvoiceCreatedNotification.php`
+- `modules/Notification/app/Listeners/SendSubmissionGradedNotification.php`
+- `modules/Notification/app/Http/Controllers/V1/NotificationLogController.php`
+- `modules/Notification/app/Http/Resources/V1/NotificationLogResource.php`
+- `modules/Notification/app/Providers/NotificationServiceProvider.php`
+- `modules/Notification/app/Providers/EventServiceProvider.php`
+- `modules/Notification/app/Providers/RouteServiceProvider.php`
+- `modules/Notification/routes/api-v1.php`
+- `modules/Notification/resources/lang/en/app.php`
+- `modules/Notification/resources/lang/ar/app.php`
+
+### Created — Events in source modules
+- `modules/Academic/app/Events/StudentEnrolled.php`
+- `modules/Exam/app/Events/ExamPublished.php`
+- `modules/Exam/app/Events/SubmissionGraded.php`
+- `modules/Assignment/app/Events/AssignmentPublished.php`
+- `modules/Assignment/app/Events/SubmissionGraded.php`
+- `modules/Payment/app/Events/InvoiceCreated.php`
+
+### Modified
+- `modules/Exam/app/Http/Controllers/V1/ExamController.php` — dispatch ExamPublished on publish
+- `modules/Exam/app/Http/Controllers/V1/ExamSubmissionController.php` — dispatch SubmissionGraded after grade
+- `modules/Assignment/app/Http/Controllers/V1/AssignmentController.php` — dispatch AssignmentPublished on publish
+- `modules/Assignment/app/Http/Controllers/V1/AssignmentSubmissionController.php` — dispatch SubmissionGraded after grade
+- `modules_statuses.json` — added "Notification": true
+
+### Key design decisions
+| Decision | Value |
+|---|---|
+| Channel | Email only (SMS deferred) |
+| Queue | ShouldQueue on both Notifications and Listeners — non-blocking |
+| Logging | Every send attempt logged to notification_logs (status: sent/failed) |
+| Error handling | Failed sends caught, logged with error_message — never crash the request |
+| Overdue reminders | Manual trigger endpoint + automatic via InvoiceCreated event |
+| Shared listener | SendSubmissionGradedNotification handles both Exam and Assignment graded events |
+
+### Pending migrations
+- `2026_06_24_000010_create_notification_logs_table`
+- All P10 assignment migrations
+- All P9 exam migrations
+- `2026_06_17_000002_add_qr_to_group_sessions` (P8)
+
+## Phase P12 — Student Portal — 2026-06-24
+
+### New module: StudentPortal
+
+### Created
+- `modules/StudentPortal/module.json`
+- `modules/StudentPortal/composer.json`
+- `modules/StudentPortal/app/Providers/StudentPortalServiceProvider.php`
+- `modules/StudentPortal/app/Providers/RouteServiceProvider.php`
+- `modules/StudentPortal/app/Providers/EventServiceProvider.php`
+- `modules/StudentPortal/app/Events/StudentRegistered.php`
+- `modules/StudentPortal/app/Events/StudentPasswordResetRequested.php`
+- `modules/StudentPortal/app/Listeners/SendStudentEmailVerificationListener.php`
+- `modules/StudentPortal/app/Listeners/SendStudentPasswordResetOtpListener.php`
+- `modules/StudentPortal/app/Http/Controllers/V1/StudentAuthController.php` — login, me, updateProfile, changePassword, logout, refresh, forgetPassword, resetPassword
+- `modules/StudentPortal/app/Http/Controllers/V1/StudentDashboardController.php` — enrollments, sessions, upcomingSessions, attendanceSummary
+- `modules/StudentPortal/app/Http/Controllers/V1/StudentExamController.php` — index, show, start, saveAnswer, submit, myAttempts, showAttempt
+- `modules/StudentPortal/app/Http/Controllers/V1/StudentAssignmentController.php` — index, show, submit, mySubmission
+- `modules/StudentPortal/app/Http/Controllers/V1/StudentPaymentController.php` — invoices, showInvoice, summary
+- `modules/StudentPortal/app/Http/Resources/V1/StudentProfileResource.php`
+- `modules/StudentPortal/app/Http/Resources/V1/EnrollmentResource.php`
+- `modules/StudentPortal/app/Http/Resources/V1/SessionResource.php`
+- `modules/StudentPortal/app/Http/Resources/V1/ExamResource.php`
+- `modules/StudentPortal/app/Http/Resources/V1/ExamSubmissionResource.php`
+- `modules/StudentPortal/app/Http/Resources/V1/AssignmentResource.php`
+- `modules/StudentPortal/app/Http/Resources/V1/AssignmentSubmissionResource.php`
+- `modules/StudentPortal/app/Http/Resources/V1/InvoiceResource.php`
+- `modules/StudentPortal/resources/lang/en/app.php`
+- `modules/StudentPortal/resources/lang/ar/app.php`
+- `modules/StudentPortal/routes/api-v1.php`
+
+### Modified
+- `config/auth.php` — added `student` guard (JWT) + `students` provider (Student model)
+- `modules/Student/app/Models/Student.php` — added `otps()` morphMany relation
+- `modules_statuses.json` — StudentPortal: true
+- `PROGRESS.md` — P12 ✅ Done
+
+### Route namespace
+All student portal routes: `/api/v1/{channel_slug}/student/...`
+Auth guard: `auth:student` (JWT, separate from staff `auth:user`)
+
+### No new migrations needed
+P12 uses existing tables from P7 (enrollments, invoices), P9 (exams, submissions), P10 (assignments, submissions), P8 (sessions, attendance)

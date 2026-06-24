@@ -11,6 +11,7 @@ use Modules\Exam\App\Models\ExamSubmission;
 use Modules\Exam\App\Http\Requests\V1\ExamSubmitRequest;
 use Modules\Exam\App\Http\Requests\V1\ExamGradeRequest;
 use Modules\Exam\App\Http\Resources\V1\ExamSubmissionResource;
+use Modules\Exam\App\Events\SubmissionGraded as ExamSubmissionGraded;
 use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
@@ -278,8 +279,14 @@ class ExamSubmissionController extends BaseController
             return $this->errorResponse(__('exam.operation_failed'), 500);
         }
 
+        $fresh = $submission->fresh(['answers', 'answers.question', 'answers.selectedOption']);
+
+        if ($fresh->status === 'graded') {
+            ExamSubmissionGraded::dispatch($fresh);
+        }
+
         return $this->successResponse(
-            new ExamSubmissionResource($submission->fresh(['answers', 'answers.question', 'answers.selectedOption'])),
+            new ExamSubmissionResource($fresh),
             __('exam.submission.graded')
         );
     }

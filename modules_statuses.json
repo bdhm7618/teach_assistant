@@ -8,5 +8,8 @@
     "Student": true,
     "Attendance": true,
     "Payment": true,
-    "Exam": true
+    "Exam": true,
+    "Assignment": true,
+    "Notification": true,
+    "StudentPortal": true
 }

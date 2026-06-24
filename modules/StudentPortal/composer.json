@@ -1,0 +1,28 @@
+{
+    "name": "nwidart/studentportal",
+    "description": "Student self-service portal",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\StudentPortal\\": "app/",
+            "Modules\\StudentPortal\\Database\\Factories\\": "database/factories/",
+            "Modules\\StudentPortal\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\StudentPortal\\Tests\\": "tests/"
+        }
+    }
+}
