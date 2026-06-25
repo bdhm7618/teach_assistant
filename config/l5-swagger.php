@@ -43,10 +43,13 @@ return [
                 /*
                  * Absolute paths to directory containing the swagger annotations are stored.
                  */
-                'annotations' => [
-                    base_path('app'),
-                    base_path('modules'),
-                ],
+                'annotations' => array_merge(
+                    [base_path('app')],
+                    array_filter(array_map(
+                        fn($dir) => is_dir($dir . '/App') ? $dir . '/App' : (is_dir($dir . '/app') ? $dir . '/app' : null),
+                        glob(base_path('modules') . '/*', GLOB_ONLYDIR)
+                    ))
+                ),
             ],
         ],
     ],
