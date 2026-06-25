@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Academic\App\Http\Controllers\V1\AcademicYearController;
 use Modules\Academic\App\Http\Controllers\V1\ClassGradeController;
 use Modules\Academic\App\Http\Controllers\V1\CourseController;
 use Modules\Academic\App\Http\Controllers\V1\GroupController;
@@ -18,9 +17,6 @@ use Modules\Academic\App\Http\Controllers\V1\SubjectController;
 Route::prefix('{channel_slug}')
     ->middleware(['identify.tenant', 'auth:user'])
     ->group(function () {
-
-        // Academic years
-        Route::apiResource('academic-years', AcademicYearController::class)->except(['destroy']);
 
         // Class grades
         Route::apiResource('class-grades', ClassGradeController::class);
