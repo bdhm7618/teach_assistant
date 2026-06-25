@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Modules\Core\App\Providers\EventServiceProvider;
+use Modules\Core\App\Providers\RouteServiceProvider;
 
 class CoreServiceProvider extends ServiceProvider
 {

@@ -2,28 +2,34 @@
 
 namespace Modules\Academic\App\Models;
 
-use Modules\Channel\App\Traits\HasChannelScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Academic\App\Models\ClassGrade;
+use Modules\Academic\App\Models\Course;
+use Modules\Academic\App\Models\GroupUser;
+use Modules\Academic\App\Models\SessionTime;
+use Modules\Academic\App\Models\StudentEnrollment;
+use Modules\Academic\App\Models\Subject;
+use Modules\Channel\App\Models\User;
+use Modules\Channel\App\Traits\HasChannelScope;
+use Modules\Student\App\Models\Student;
 
 class Group extends Model
 {
-    use HasChannelScope;
-    
+    use HasChannelScope, SoftDeletes;
+
     protected $fillable = [
-        'name',
-        'code',
-        'class_grade_id',
-        'subject_id',
-        'capacity',
-        'price',
-        'is_active',
-        'channel_id'
+        'name', 'code', 'course_id', 'class_grade_id', 'subject_id',
+        'capacity', 'price', 'payment_model', 'starts_at', 'ends_at',
+        'status', 'is_active', 'channel_id',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'capacity' => 'integer',
-        'price' => 'decimal:2',
+        'is_active'  => 'boolean',
+        'capacity'   => 'integer',
+        'price'      => 'decimal:2',
+        'starts_at'  => 'date',
+        'ends_at'    => 'date',
     ];
 
     /**
@@ -53,9 +59,14 @@ class Group extends Model
     /**
      * Get the students in this group
      */
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
     public function students()
     {
-        return $this->belongsToMany(\Modules\Student\App\Models\Student::class, 'group_students', 'group_id', 'student_id')
+        return $this->belongsToMany(Student::class, 'group_students', 'group_id', 'student_id')
             ->withTimestamps();
     }
 
@@ -81,7 +92,7 @@ class Group extends Model
     public function users()
     {
         return $this->belongsToMany(
-            \Modules\Channel\App\Models\User::class,
+            User::class,
             'group_users',
             'group_id',
             'user_id'

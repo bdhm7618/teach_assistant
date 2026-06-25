@@ -29,6 +29,11 @@ return [
             'driver' => 'jwt',
             'provider' => 'admins',
         ],
+
+        'student' => [
+            'driver' => 'jwt',
+            'provider' => 'students',
+        ],
     ],
 
     /*
@@ -44,7 +49,12 @@ return [
 
         'admins' => [
             'driver' => 'eloquent',
-            'model' => \Modules\Admin\Models\Admin::class,
+            'model' => \Modules\Admin\App\Models\Admin::class,
+        ],
+
+        'students' => [
+            'driver' => 'eloquent',
+            'model' => \Modules\Student\App\Models\Student::class,
         ],
     ],
 

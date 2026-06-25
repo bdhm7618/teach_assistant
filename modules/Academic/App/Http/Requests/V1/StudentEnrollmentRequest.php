@@ -29,7 +29,7 @@ class StudentEnrollmentRequest extends BaseRequest
                 'integer',
                 $this->belongsToChannel(Group::class),
             ],
-            'enrollment_type' => 'required|in:monthly,course,session_package',
+            'enrollment_type' => 'required|in:monthly,per_course,per_session',
             'status' => 'nullable|in:active,paused,canceled,completed',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',

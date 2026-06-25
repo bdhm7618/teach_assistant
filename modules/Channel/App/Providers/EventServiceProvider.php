@@ -4,7 +4,9 @@ namespace Modules\Channel\App\Providers;
 
 
 use Modules\Channel\App\Events\UserRegistered;
+use Modules\Channel\App\Events\PasswordResetRequested;
 use Modules\Channel\App\Listeners\SendEmailVerificationListener;
+use Modules\Channel\App\Listeners\SendPasswordResetOtpListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -17,6 +19,9 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         UserRegistered::class => [
             SendEmailVerificationListener::class,
+        ],
+        PasswordResetRequested::class => [
+            SendPasswordResetOtpListener::class,
         ],
     ];
 

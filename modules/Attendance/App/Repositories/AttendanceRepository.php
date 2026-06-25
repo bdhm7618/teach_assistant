@@ -147,17 +147,32 @@ class AttendanceRepository extends BaseRepository
      * @param int|null $channelId
      * @return bool
      */
-    public function exists(int $studentId, int $groupId, Carbon|string $date, ?int $channelId = null): bool
+    public function exists(int $studentId, int $groupId, Carbon|string $date, ?int $channelId = null, ?int $sessionId = null): bool
     {
         $query = $this->model->where('student_id', $studentId)
-            ->where('group_id', $groupId)
-            ->whereDate('date', $date);
+            ->where('group_id', $groupId);
+
+        // When a session_id is supplied, scope the duplicate check to that session only
+        if ($sessionId) {
+            $query->where('session_id', $sessionId);
+        } else {
+            $query->whereDate('date', $date);
+        }
 
         if ($channelId) {
             $query->where('channel_id', $channelId);
         }
 
         return $query->exists();
+    }
+
+    public function getBySession(int $sessionId): Collection
+    {
+        return $this->model
+            ->where('session_id', $sessionId)
+            ->with(['student'])
+            ->orderBy('date')
+            ->get();
     }
 }
 

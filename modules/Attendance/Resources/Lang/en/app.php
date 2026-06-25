@@ -8,6 +8,15 @@ return [
     'operation_failed' => 'Something went wrong! Please try again.',
     'bulk_created' => 'Attendance records created successfully.',
     'statistics_retrieved' => 'Statistics retrieved successfully.',
+    'live_retrieved'       => 'Live attendance retrieved successfully.',
+
+    'qr' => [
+        'invalid_token'    => 'Invalid or tampered QR token.',
+        'token_expired'    => 'This QR code has expired. Ask the teacher to regenerate it.',
+        'blocked_absent'   => 'You were manually marked absent for this session. Contact your teacher.',
+        'already_checked_in' => 'You have already checked in for this session.',
+        'checked_in'       => 'Attendance recorded successfully.',
+    ],
 
     'status' => [
         'present' => 'Present',

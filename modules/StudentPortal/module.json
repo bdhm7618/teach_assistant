@@ -1,0 +1,11 @@
+{
+    "name": "StudentPortal",
+    "alias": "studentportal",
+    "description": "Student self-service portal — auth, dashboard, exams, assignments, payments",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\StudentPortal\\App\\Providers\\StudentPortalServiceProvider"
+    ],
+    "files": []
+}
