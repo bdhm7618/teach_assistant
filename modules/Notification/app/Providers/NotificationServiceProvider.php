@@ -5,6 +5,8 @@ namespace Modules\Notification\App\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
+use Modules\Notification\App\Providers\EventServiceProvider;
+use Modules\Notification\App\Providers\RouteServiceProvider;
 use Modules\Notification\App\Services\NotificationService;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -24,7 +26,7 @@ class NotificationServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->loadMigrationsFrom(dirname(__DIR__, 2) . '/database/migrations');
     }
 
     public function register(): void
@@ -47,8 +49,9 @@ class NotificationServiceProvider extends ServiceProvider
             $this->loadTranslationsFrom($langPath, $this->nameLower);
             $this->loadJsonTranslationsFrom($langPath);
         } else {
-            $this->loadTranslationsFrom(module_path($this->name, 'lang'), $this->nameLower);
-            $this->loadJsonTranslationsFrom(module_path($this->name, 'lang'));
+            $moduleLangPath = dirname(__DIR__, 2) . '/resources/lang';
+            $this->loadTranslationsFrom($moduleLangPath, $this->nameLower);
+            $this->loadJsonTranslationsFrom($moduleLangPath);
         }
     }
 
