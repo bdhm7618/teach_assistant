@@ -4,24 +4,18 @@ namespace Modules\Exam\App\Http\Controllers\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Modules\Channel\App\Http\Controllers\V1\BaseController;
+use Illuminate\Routing\Controller;
 use Modules\Exam\App\Models\Exam;
 use Modules\Exam\App\Models\ExamQuestion;
 use Modules\Exam\App\Models\ExamOption;
 use Modules\Exam\App\Http\Requests\V1\ExamQuestionRequest;
 use Modules\Exam\App\Http\Resources\V1\ExamQuestionResource;
-use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
  * @OA\Tag(name="Exam Questions", description="Manage questions and answer options within an exam")
  */
-class ExamQuestionController extends BaseController
+class ExamQuestionController extends Controller
 {
-    protected function getRepository(): BaseRepository
-    {
-        // Not repository-backed — direct model access
-        throw new \LogicException('Use direct model access.');
-    }
 
     protected function getResource(): string
     {

@@ -4,8 +4,7 @@ namespace Modules\Assignment\App\Http\Controllers\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Prettus\Repository\Eloquent\BaseRepository;
-use Modules\Channel\App\Http\Controllers\V1\BaseController;
+use Illuminate\Routing\Controller;
 use Modules\Assignment\App\Models\Assignment;
 use Modules\Assignment\App\Models\AssignmentAttachment;
 use Modules\Assignment\App\Models\AssignmentSubmission;
@@ -17,12 +16,8 @@ use Modules\Assignment\App\Events\SubmissionGraded as AssignmentSubmissionGraded
 /**
  * @OA\Tag(name="Assignment Submissions", description="Student submission and teacher grading for assignments")
  */
-class AssignmentSubmissionController extends BaseController
+class AssignmentSubmissionController extends Controller
 {
-    protected function getRepository(): BaseRepository
-    {
-        throw new \LogicException('AssignmentSubmissionController does not use a repository.');
-    }
 
     protected function getResource(): string
     {
