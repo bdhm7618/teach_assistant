@@ -23,6 +23,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('api')
             ->prefix('api/v1')
-            ->group(module_path($this->name, '/routes/api-v1.php'));
+            ->group(dirname(__DIR__, 2) . '/routes/api-v1.php');
     }
 }

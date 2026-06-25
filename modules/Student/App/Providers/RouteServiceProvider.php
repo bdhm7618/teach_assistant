@@ -37,7 +37,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        $apiRoutesPath = module_path('Student', 'Routes/api-v1.php');
+        $apiRoutesPath = dirname(__DIR__, 2) . '/Routes/api-v1.php';
         
         if (file_exists($apiRoutesPath)) {
             Route::middleware('api')
