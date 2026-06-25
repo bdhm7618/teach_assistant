@@ -50,6 +50,8 @@ return [
                         glob(base_path('modules') . '/*', GLOB_ONLYDIR)
                     ))
                 ),
+
+                'excludes' => [],
             ],
         ],
     ],
