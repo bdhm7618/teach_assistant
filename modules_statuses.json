@@ -11,5 +11,6 @@
     "Exam": true,
     "Assignment": true,
     "Notification": true,
-    "StudentPortal": true
+    "StudentPortal": true,
+    "ParentPortal": true
 }

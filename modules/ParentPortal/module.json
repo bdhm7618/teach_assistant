@@ -1,0 +1,11 @@
+{
+    "name": "ParentPortal",
+    "alias": "parentportal",
+    "description": "Parent/guardian self-service portal — auth, children overview, attendance, exams, assignments, invoices",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ParentPortal\\App\\Providers\\ParentPortalServiceProvider"
+    ],
+    "files": []
+}

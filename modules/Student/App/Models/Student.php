@@ -136,5 +136,18 @@ class Student extends Authenticatable
     {
         return $this->morphMany(\Modules\Core\App\Models\Otp::class, 'otpable');
     }
+
+    /**
+     * The parent/guardian accounts that can view this student.
+     */
+    public function parents()
+    {
+        return $this->belongsToMany(
+            \Modules\ParentPortal\App\Models\ParentAccount::class,
+            'parent_student',
+            'student_id',
+            'parent_id'
+        )->withPivot(['relationship', 'is_primary'])->withTimestamps();
+    }
 }
 

@@ -66,7 +66,10 @@
             "Modules\\Notification\\Database\\Seeders\\": "modules/Notification/Database/Seeders/",
             "Modules\\StudentPortal\\App\\": "modules/StudentPortal/App/",
             "Modules\\StudentPortal\\Database\\Factories\\": "modules/StudentPortal/Database/Factories/",
-            "Modules\\StudentPortal\\Database\\Seeders\\": "modules/StudentPortal/Database/Seeders/"
+            "Modules\\StudentPortal\\Database\\Seeders\\": "modules/StudentPortal/Database/Seeders/",
+            "Modules\\ParentPortal\\App\\": "modules/ParentPortal/App/",
+            "Modules\\ParentPortal\\Database\\Factories\\": "modules/ParentPortal/Database/Factories/",
+            "Modules\\ParentPortal\\Database\\Seeders\\": "modules/ParentPortal/Database/Seeders/"
         },
         "files": [
             "core/Helpers/http-response-functions.php"

@@ -471,3 +471,50 @@ Auth guard: `auth:student` (JWT, separate from staff `auth:user`)
 
 ### No new migrations needed
 P12 uses existing tables from P7 (enrollments, invoices), P9 (exams, submissions), P10 (assignments, submissions), P8 (sessions, attendance)
+
+## Phase P13 — Parent Portal — 2026-06-30
+
+### New module: ParentPortal
+
+### Data model decision
+A parent is a **login account that can have many children** — modelled as a new `parents` table + a `parent_student` pivot, NOT an extension of the existing `guardians` table (which stays as a per-student contact record). New JWT guard `parent`.
+
+### Created — module scaffold
+- `modules/ParentPortal/module.json`, `composer.json`
+- `modules/ParentPortal/app/Providers/ParentPortalServiceProvider.php`
+- `modules/ParentPortal/app/Providers/RouteServiceProvider.php`
+- `modules/ParentPortal/app/Providers/EventServiceProvider.php`
+
+### Created — migrations (2, pending WAMP start)
+- `2026_06_30_000001_create_parents_table.php` — login account; email/phone unique **per channel** (multi-tenant safe)
+- `2026_06_30_000002_create_parent_student_table.php` — pivot with `relationship`, `is_primary`, `channel_id`; `unique(parent_id, student_id)`
+
+### Created — model
+- `modules/ParentPortal/app/Models/ParentAccount.php` — table `parents`; implements `JWTSubject`; `HasChannelScope`; `students()` belongsToMany; `otps()` morphMany; `ownsStudent()`
+
+### Created — auth flow
+- Events: `ParentRegistered`, `ParentPasswordResetRequested`
+- Listeners: `SendParentEmailVerificationListener`, `SendParentPasswordResetOtpListener` (reuse Core `OtpRepository` + Channel `SendEmailVerificationJob`/`SendPasswordResetOtpJob`)
+- `ParentAuthController` — register, verify-email, resend-otp, login, forget/reset-password (public); me, update-profile, change-password, logout, refresh (auth:parent)
+
+### Created — controllers
+- `ParentChildController` (auth:parent) — children list, **claim** (by student code + phone proof against student/guardian phone), unclaim; per-child read-only: enrollments, sessions+attendance, attendance summary, exams (results), assignments (submission status), invoices + summary. Every per-child method guards ownership via `resolveChild()` → 403 if not linked.
+- `ParentManagementController` (auth:user + `check.permission`) — staff list parents, list/link/unlink children
+
+### Created — resources
+- `ParentProfileResource`, `ChildResource`, `EnrollmentResource`, `SessionResource`, `ExamResource`, `AssignmentResource`, `InvoiceResource`
+
+### Modified
+- `config/auth.php` — added `parent` guard + `parents` provider
+- `modules/Student/app/Models/Student.php` — added inverse `parents()` belongsToMany
+- `modules_statuses.json` — `"ParentPortal": true`
+- `modules/Channel/database/seeders/RoleSeeder.php` — added `parents.view`/`parents.manage` to assistant; `parents.view` to viewer (owner covered by `"all"`)
+
+### Route namespaces
+- Parent-facing: `/api/v1/{channel_slug}/parent/...`  (guard `auth:parent`)
+- Staff-facing:  `/api/v1/{channel_slug}/parents/...` (guard `auth:user` + `check.permission:parents.view|parents.manage`)
+
+### Pending migrations (run when WAMP MySQL is started)
+- `2026_06_30_000001_create_parents_table`
+- `2026_06_30_000002_create_parent_student_table`
+- (plus all still-pending P8/P9/P10/P11 migrations noted above)

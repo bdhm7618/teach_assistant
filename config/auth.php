@@ -34,6 +34,11 @@ return [
             'driver' => 'jwt',
             'provider' => 'students',
         ],
+
+        'parent' => [
+            'driver' => 'jwt',
+            'provider' => 'parents',
+        ],
     ],
 
     /*
@@ -55,6 +60,11 @@ return [
         'students' => [
             'driver' => 'eloquent',
             'model' => \Modules\Student\App\Models\Student::class,
+        ],
+
+        'parents' => [
+            'driver' => 'eloquent',
+            'model' => \Modules\ParentPortal\App\Models\ParentAccount::class,
         ],
     ],
 

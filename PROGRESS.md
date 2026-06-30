@@ -1,6 +1,6 @@
 # Channel Project — Implementation Progress
 
-Last updated: 2026-06-24
+Last updated: 2026-06-30
 
 ## Phase 0 — Architecture Fixes
 
@@ -26,7 +26,7 @@ Last updated: 2026-06-24
 | P10 | Assignment Module | ✅ Done | 2026-06-24 |
 | P11 | Notifications | ✅ Done | 2026-06-24 |
 | P12 | Student Portal | ✅ Done | 2026-06-24 |
-| P13 | Parent Portal | ⬜ Pending | P5, P12 |
+| P13 | Parent Portal | ✅ Done | 2026-06-30 |
 | P14 | Live Sessions (WebRTC) | ⬜ Pending | P8 |
 | P15 | Platform Admin | ⬜ Pending | All |
 
@@ -35,6 +35,9 @@ Last updated: 2026-06-24
 | Decision | Value |
 |---|---|
 | Auth driver | JWT (tymon/jwt-auth v2) |
+| Parent account model | Separate `parents` table + `parent_student` pivot (one parent → many children); JWT `parent` guard. Not the same as the `guardians` contact record. |
+| Parent child linking | BOTH self-service claim-by-code (student code + phone proof) AND staff link/unlink (`parents.view`/`parents.manage`) |
+| Parent portal scope | Read-only across children's enrollments, sessions/attendance, exams, assignments, invoices (no payment actions) |
 | Late threshold | 15 min after `scheduled_at` |
 | QR after manual absent | BLOCK — no override |
 | Overpayment | REJECT |

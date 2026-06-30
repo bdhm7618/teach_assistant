@@ -1,0 +1,28 @@
+{
+    "name": "nwidart/parentportal",
+    "description": "Parent self-service portal",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ParentPortal\\": "app/",
+            "Modules\\ParentPortal\\Database\\Factories\\": "database/factories/",
+            "Modules\\ParentPortal\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\ParentPortal\\Tests\\": "tests/"
+        }
+    }
+}
