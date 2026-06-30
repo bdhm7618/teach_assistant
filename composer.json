@@ -55,7 +55,18 @@
             "Modules\\Student\\App\\": "modules/Student/App/",
             "Modules\\Student\\Database\\Factories\\": "modules/Student/Database/Factories/",
             "Modules\\Student\\Database\\Seeders\\": "modules/Student/Database/Seeders/",
-            "Modules\\StudentPortal\\App\\": "modules/StudentPortal/app/"
+            "Modules\\Exam\\App\\": "modules/Exam/App/",
+            "Modules\\Exam\\Database\\Factories\\": "modules/Exam/Database/Factories/",
+            "Modules\\Exam\\Database\\Seeders\\": "modules/Exam/Database/Seeders/",
+            "Modules\\Assignment\\App\\": "modules/Assignment/App/",
+            "Modules\\Assignment\\Database\\Factories\\": "modules/Assignment/Database/Factories/",
+            "Modules\\Assignment\\Database\\Seeders\\": "modules/Assignment/Database/Seeders/",
+            "Modules\\Notification\\App\\": "modules/Notification/App/",
+            "Modules\\Notification\\Database\\Factories\\": "modules/Notification/Database/Factories/",
+            "Modules\\Notification\\Database\\Seeders\\": "modules/Notification/Database/Seeders/",
+            "Modules\\StudentPortal\\App\\": "modules/StudentPortal/App/",
+            "Modules\\StudentPortal\\Database\\Factories\\": "modules/StudentPortal/Database/Factories/",
+            "Modules\\StudentPortal\\Database\\Seeders\\": "modules/StudentPortal/Database/Seeders/"
         },
         "files": [
             "core/Helpers/http-response-functions.php"

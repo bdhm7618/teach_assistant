@@ -116,7 +116,7 @@ class ExamController extends BaseController
      *     @OA\Response(response=403, description="Requires exams.view")
      * )
      */
-    public function show(int $id): JsonResponse
+    public function show($id): JsonResponse
     {
         $exam = Exam::with(['questions.options'])
             ->withCount(['questions', 'submissions'])

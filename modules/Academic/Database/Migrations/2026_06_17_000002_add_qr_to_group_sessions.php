@@ -9,10 +9,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('group_sessions', function (Blueprint $table) {
-            // Signed QR token stored so it can be invalidated by clearing it
-            $table->string('qr_token', 500)->nullable()->unique()->after('notes');
-            // QR expires at scheduled_at + duration_minutes + 30 min grace period
-            $table->dateTime('qr_expires_at')->nullable()->after('qr_token');
+            if (! Schema::hasColumn('group_sessions', 'qr_token')) {
+                $table->string('qr_token', 191)->nullable()->unique()->after('notes');
+            } else {
+                // Column exists from a previous partial run — shrink it so the unique index fits, then add it
+                $table->string('qr_token', 191)->nullable()->change();
+                $table->unique('qr_token');
+            }
+            if (! Schema::hasColumn('group_sessions', 'qr_expires_at')) {
+                $table->dateTime('qr_expires_at')->nullable()->after('qr_token');
+            }
         });
     }
 

@@ -44,9 +44,21 @@ return [
                  * Absolute paths to directory containing the swagger annotations are stored.
                  */
                 'annotations' => [
-                    base_path('app'),
-                    base_path('modules'),
+                    base_path('app/Http/Schemas'),
+                    base_path('modules/Academic/App/Http'),
+                    base_path('modules/Admin/App/Http'),
+                    base_path('modules/Attendance/App/Http'),
+                    base_path('modules/Channel/App/Http'),
+                    base_path('modules/Core/App/Http'),
+                    base_path('modules/Payment/App/Http'),
+                    base_path('modules/Student/App/Http'),
+                    base_path('modules/Exam/app/Http'),
+                    base_path('modules/Assignment/app/Http'),
+                    base_path('modules/Notification/app/Http'),
+                    base_path('modules/StudentPortal/app/Http'),
                 ],
+
+                'excludes' => [],
             ],
         ],
     ],

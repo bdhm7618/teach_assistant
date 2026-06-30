@@ -37,6 +37,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        Route::prefix('api/v1')->group(module_path($this->name, '/Routes/api-v1.php'));
+        Route::prefix('api/v1')->group(dirname(__DIR__, 2) . '/Routes/api-v1.php');
     }
 }

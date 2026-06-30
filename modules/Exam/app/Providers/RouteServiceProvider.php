@@ -21,7 +21,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapApiRoutes(): void
     {
-        $apiV1Path = module_path($this->name, '/routes/api-v1.php');
+        $apiV1Path = dirname(__DIR__, 2) . '/routes/api-v1.php';
         if (file_exists($apiV1Path)) {
             Route::middleware('api')->group($apiV1Path);
         }

@@ -4,7 +4,7 @@ namespace Modules\Exam\App\Http\Controllers\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Modules\Channel\App\Http\Controllers\V1\BaseController;
+use Illuminate\Routing\Controller;
 use Modules\Exam\App\Models\Exam;
 use Modules\Exam\App\Models\ExamAnswer;
 use Modules\Exam\App\Models\ExamSubmission;
@@ -12,17 +12,12 @@ use Modules\Exam\App\Http\Requests\V1\ExamSubmitRequest;
 use Modules\Exam\App\Http\Requests\V1\ExamGradeRequest;
 use Modules\Exam\App\Http\Resources\V1\ExamSubmissionResource;
 use Modules\Exam\App\Events\SubmissionGraded as ExamSubmissionGraded;
-use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
  * @OA\Tag(name="Exam Submissions", description="Student exam submissions — start, submit answers, grade essays")
  */
-class ExamSubmissionController extends BaseController
+class ExamSubmissionController extends Controller
 {
-    protected function getRepository(): BaseRepository
-    {
-        throw new \LogicException('Use direct model access.');
-    }
 
     protected function getResource(): string
     {
